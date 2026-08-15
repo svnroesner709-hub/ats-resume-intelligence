@@ -120,6 +120,8 @@ function render(result) {
   renderNotImplemented(result.not_yet_implemented);
   renderPriorityLists(result);
   renderAllFindings(result.findings);
+  renderKeywordCoverage(result.keyword_coverage);
+  renderJDMatch(result.jd_match);
 }
 
 function renderViewer(result) {
@@ -160,12 +162,31 @@ function renderViewer(result) {
   }
 }
 
-function scoreRowHtml(score) {
+function checkRowHtml(c) {
+  const sourceHtml = c.source
+    ? `<span class="check-source" title="${escapeHtml(c.source.claim || "")}">Level ${escapeHtml(c.source.confidence)}${c.source.url ? ` · <a href="${c.source.url}" target="_blank" rel="noopener">source</a>` : ""}</span>`
+    : "";
+  return `<div class="check-row ${c.passed ? "pass" : "fail"}">
+    <span class="check-icon">${c.passed ? "✓" : "✗"}</span>
+    <span class="check-body"><span class="check-name">${escapeHtml(c.name)}</span><span class="check-detail">${escapeHtml(c.detail)}</span></span>
+    ${sourceHtml}
+  </div>`;
+}
+
+function scoreRowHtml(key, score) {
   const valueHtml =
     score.status === "computed"
       ? `<span class="score-value">${score.value}/100</span>`
-      : `<span class="score-value na">not yet implemented</span>`;
-  return `<div class="score-row"><span>${score.label}</span>${valueHtml}</div>`;
+      : `<span class="score-value na">${score.status === "llm_error" ? "error" : "not configured"}</span>`;
+  const hasChecks = score.checks && score.checks.length > 0;
+  const caret = hasChecks ? `<span class="score-caret">▸</span>` : "";
+  const header = `<div class="score-row${hasChecks ? " expandable" : ""}" data-score-key="${key}">${caret}<span>${escapeHtml(score.label)}</span>${valueHtml}</div>`;
+  const explanation = score.explanation
+    ? `<div class="score-explanation">${escapeHtml(score.explanation)}</div>`
+    : "";
+  const checksHtml = hasChecks ? score.checks.map(checkRowHtml).join("") : "";
+  const body = `<div class="score-checklist" id="checklist-${key}" style="display:none;">${explanation}${checksHtml}</div>`;
+  return header + body;
 }
 
 function renderScores(scores) {
@@ -179,7 +200,16 @@ function renderScores(scores) {
     "executive_seniority_signal",
     "overall_resume_strength",
   ];
-  $("#scores-block").innerHTML = order.map((key) => scoreRowHtml(scores[key])).join("");
+  $("#scores-block").innerHTML = order.map((key) => scoreRowHtml(key, scores[key])).join("");
+  $("#scores-block").querySelectorAll(".score-row.expandable").forEach((row) => {
+    row.addEventListener("click", () => {
+      const key = row.dataset.scoreKey;
+      const body = document.getElementById(`checklist-${key}`);
+      const isOpen = body.style.display !== "none";
+      body.style.display = isOpen ? "none" : "block";
+      row.classList.toggle("open", !isOpen);
+    });
+  });
 }
 
 function renderNotImplemented(notes) {
@@ -190,8 +220,7 @@ function renderNotImplemented(notes) {
   }
   el.style.display = "block";
   el.innerHTML =
-    "<strong>Scope note:</strong> This build implements deterministic parsing &amp; ATS structural analysis (Phases 1&ndash;5) only. Not yet implemented: " +
-    notes.join(" ");
+    "<strong>Not yet available:</strong><ul>" + notes.map((n) => `<li>${escapeHtml(n)}</li>`).join("") + "</ul>";
 }
 
 function findingRowHtml(f) {
@@ -235,6 +264,66 @@ function renderAllFindings(findings) {
   attachRowHandlers(el);
 }
 
+function renderKeywordCoverage(coverage) {
+  const el = $("#keyword-coverage-block");
+  if (!coverage) {
+    el.innerHTML = `<div class="empty-note">No keyword coverage data.</div>`;
+    return;
+  }
+  const enrichmentNote = coverage.llm_enrichment_ran
+    ? `<div class="notice">Includes an LLM semantic-enrichment pass (near-miss matches beyond the dictionary).</div>`
+    : `<div class="notice">Dictionary matching only. Set ANTHROPIC_API_KEY to additionally catch semantic near-misses.</div>`;
+
+  const categoriesHtml = coverage.categories
+    .map((c) => `<div class="kw-category-row"><span>${escapeHtml(c.label)}</span><span>${c.matched_terms}/${c.total_terms} (${Math.round(c.coverage_ratio * 100)}%)</span></div>`)
+    .join("");
+
+  const matchedChips = coverage.matched
+    .map((m) => `<span class="kw-chip ${m.via === "llm_semantic" ? "llm" : ""}" title="${escapeHtml(m.matched_form)} · ${escapeHtml(m.category_label)}">${escapeHtml(m.term)}</span>`)
+    .join("") || `<span class="empty-note">No terms matched.</span>`;
+
+  const missingChips = coverage.notable_missing
+    .slice(0, 15)
+    .map((t) => `<span class="kw-chip missing">${escapeHtml(t)}</span>`)
+    .join("") || `<span class="empty-note">None.</span>`;
+
+  el.innerHTML = `
+    ${enrichmentNote}
+    <h3 class="kw-heading">Coverage by category</h3>
+    ${categoriesHtml}
+    <h3 class="kw-heading">Matched terms (${coverage.matched.length})</h3>
+    <div class="kw-chip-row">${matchedChips}</div>
+    <h3 class="kw-heading">Notable missing terms (relevant categories)</h3>
+    <div class="kw-chip-row">${missingChips}</div>
+  `;
+}
+
+function renderJDMatch(jdMatch) {
+  const el = $("#jd-match-block");
+  if (!jdMatch) {
+    el.innerHTML = `<div class="empty-note">Paste a job description before analyzing to see a Requirement Coverage Matrix here.</div>`;
+    return;
+  }
+  if (jdMatch.status !== "computed") {
+    el.innerHTML = `<div class="notice">${escapeHtml(jdMatch.status)}: ${escapeHtml(jdMatch.explanation || "")}</div>`;
+    return;
+  }
+  const rows = jdMatch.requirements
+    .map(
+      (r) => `<div class="jd-row jd-${r.resume_coverage}">
+        <div class="jd-req"><strong>${escapeHtml(r.requirement)}</strong> <span class="jd-importance">${escapeHtml(r.jd_importance)}</span></div>
+        <div class="jd-coverage-tag">${escapeHtml(r.resume_coverage.replace("_", " "))}</div>
+        ${r.evidence ? `<div class="jd-evidence">"${escapeHtml(r.evidence)}"</div>` : ""}
+        ${r.recommendation ? `<div class="jd-recommendation">${escapeHtml(r.recommendation)}</div>` : ""}
+      </div>`
+    )
+    .join("");
+  el.innerHTML = `
+    <div class="notice">${escapeHtml(jdMatch.overall_fit_note)}</div>
+    ${rows || `<div class="empty-note">No requirements extracted.</div>`}
+  `;
+}
+
 // Tabs
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -242,6 +331,8 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.classList.add("active");
     $("#tab-priority").style.display = btn.dataset.tab === "priority" ? "block" : "none";
     $("#tab-all").style.display = btn.dataset.tab === "all" ? "block" : "none";
+    $("#tab-keywords").style.display = btn.dataset.tab === "keywords" ? "block" : "none";
+    $("#tab-jd").style.display = btn.dataset.tab === "jd" ? "block" : "none";
   });
 });
 

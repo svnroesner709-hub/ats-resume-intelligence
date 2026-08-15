@@ -1,0 +1,24 @@
+{
+  "category": "ownership_verbs",
+  "label": "Ownership vs. Weak-Participation Language",
+  "description": "Expanded verb bank used by aerospace_engine/ownership_scan.py to distinguish bullets that show ownership of outcomes from bullets dominated by weak participation language (spec Layer 7).",
+  "source_confidence": "E",
+  "note": "Compiled from domain knowledge, not yet backed by a live-fetched citation.",
+  "weak_participation_verbs": [
+    "helped", "helped with", "supported", "worked with", "worked on", "participated in",
+    "assisted", "assisted with", "responsible for", "involved in", "contributed to",
+    "collaborated on", "took part in", "aided", "backed up", "provided support for",
+    "was part of", "played a role in", "engaged in", "coordinated with"
+  ],
+  "ownership_verbs": [
+    "directed", "led", "owned", "drove", "delivered", "managed", "recovered", "executed",
+    "negotiated", "restructured", "spearheaded", "championed", "orchestrated", "steered",
+    "authored", "established", "built", "launched", "scaled", "transformed", "overhauled",
+    "pioneered", "engineered", "architected", "commanded", "chaired", "oversaw",
+    "accelerated", "reduced", "increased", "cut", "eliminated", "streamlined", "resolved",
+    "negotiated", "secured", "won", "closed", "consolidated", "unified", "standardized",
+    "implemented", "deployed", "certified", "qualified", "validated", "recovered",
+    "salvaged", "rescued", "turned around", "de-risked", "mitigated", "forecasted",
+    "budgeted", "allocated", "staffed", "hired", "mentored", "coached", "trained"
+  ]
+}

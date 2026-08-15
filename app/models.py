@@ -177,11 +177,23 @@ class TargetProfile(BaseModel):
     background_notes: Optional[str] = None
 
 
+class ScoreCheck(BaseModel):
+    """One named, evidence-backed check that fed a ScoreValue's number.
+    Every check is derived from data already computed elsewhere (findings,
+    extraction comparison, keyword matches, ...) -- never a parallel
+    re-implementation that could drift from the actual rule/finding logic."""
+    name: str
+    passed: bool
+    detail: str
+    source: Optional[SourceCitation] = None
+
+
 class ScoreValue(BaseModel):
     value: Optional[int] = None  # 0-100, None if not computed
     label: str
-    status: str = "computed"  # "computed" | "not yet implemented"
+    status: str = "computed"  # "computed" | "not yet implemented" | "llm_error"
     explanation: Optional[str] = None
+    checks: list[ScoreCheck] = Field(default_factory=list)
 
 
 class Scores(BaseModel):
@@ -193,6 +205,53 @@ class Scores(BaseModel):
     recruiter_readability: ScoreValue
     executive_seniority_signal: ScoreValue
     overall_resume_strength: ScoreValue
+
+
+# ---------------------------------------------------------------------------
+# Keyword coverage (Phase 8 core, deterministic + optional LLM enrichment)
+# ---------------------------------------------------------------------------
+
+class MatchedKeyword(BaseModel):
+    term: str
+    category: str
+    category_label: str
+    matched_form: str  # the exact term/abbreviation/synonym/quote that matched
+    via: str  # "dictionary" | "llm_semantic"
+    confidence: SourceConfidence = SourceConfidence.E
+
+
+class CategoryCoverage(BaseModel):
+    category: str
+    label: str
+    total_terms: int
+    matched_terms: int
+    coverage_ratio: float
+
+
+class KeywordCoverageResult(BaseModel):
+    matched: list[MatchedKeyword] = Field(default_factory=list)
+    notable_missing: list[str] = Field(default_factory=list)  # high-value terms not found in any category
+    categories: list[CategoryCoverage] = Field(default_factory=list)
+    llm_enrichment_ran: bool = False
+
+
+# ---------------------------------------------------------------------------
+# JD Requirement Coverage Matrix (Phase 8 JD mode, LLM-powered)
+# ---------------------------------------------------------------------------
+
+class JDRequirementRow(BaseModel):
+    requirement: str
+    jd_importance: str  # "required" | "preferred" | "nice_to_have"
+    resume_coverage: str  # "strong_match" | "partial_match" | "missing" | "probably_irrelevant"
+    evidence: Optional[str] = None
+    recommendation: Optional[str] = None
+
+
+class JDMatchResult(BaseModel):
+    requirements: list[JDRequirementRow] = Field(default_factory=list)
+    overall_fit_note: str = ""
+    status: str = "computed"  # "computed" | "not yet implemented" | "llm_error"
+    explanation: Optional[str] = None
 
 
 class AnalysisResult(BaseModel):
@@ -209,3 +268,5 @@ class AnalysisResult(BaseModel):
     # page_number (as str, JSON dict keys must be strings) -> list of
     # normalized overlay boxes; see app/annotation/mapper.py
     overlays: dict[str, list[dict]] = Field(default_factory=dict)
+    keyword_coverage: Optional[KeywordCoverageResult] = None
+    jd_match: Optional[JDMatchResult] = None

@@ -3,9 +3,19 @@ from __future__ import annotations
 
 import functools
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
 
 KB_ROOT = Path(__file__).resolve().parent
+
+KEYWORD_CATEGORY_FILES = [
+    "keywords/aerospace_defense.json",
+    "keywords/program_management.json",
+    "keywords/manufacturing_quality.json",
+    "keywords/systems_engineering_certification.json",
+    "keywords/government_contracting.json",
+    "keywords/tools_systems.json",
+]
 
 
 @functools.lru_cache(maxsize=None)
@@ -28,3 +38,52 @@ def section_heading_variants() -> dict[str, list[str]]:
 def structural_rule_meta(rule_id: str) -> dict:
     data = load_json("ats_rules/structural_rules.json")
     return data["rules"].get(rule_id, {"why_it_matters": "", "confidence": "E"})
+
+
+@dataclass
+class KeywordTerm:
+    term: str
+    abbreviations: list[str] = field(default_factory=list)
+    synonyms: list[str] = field(default_factory=list)
+
+    @property
+    def all_forms(self) -> list[str]:
+        return [self.term] + self.abbreviations + self.synonyms
+
+
+@dataclass
+class KeywordCategory:
+    key: str
+    label: str
+    terms: list[KeywordTerm]
+
+
+@functools.lru_cache(maxsize=None)
+def keyword_database() -> tuple[KeywordCategory, ...]:
+    """The full aerospace/defense/PM/manufacturing/certification/government-
+    contracting/tools keyword database (app/knowledge_base/keywords/*.json),
+    used by app/keyword_engine/matcher.py. Returns a tuple (not a list) so
+    the lru_cache-returned value can't be accidentally mutated by callers."""
+    categories = []
+    for rel_path in KEYWORD_CATEGORY_FILES:
+        data = load_json(rel_path)
+        terms = [
+            KeywordTerm(
+                term=t["term"],
+                abbreviations=t.get("abbreviations", []),
+                synonyms=t.get("synonyms", []),
+            )
+            for t in data["terms"]
+        ]
+        categories.append(KeywordCategory(key=data["category"], label=data["label"], terms=terms))
+    return tuple(categories)
+
+
+def ownership_verbs() -> list[str]:
+    data = load_json("keywords/ownership_verbs.json")
+    return data["ownership_verbs"]
+
+
+def weak_participation_verbs() -> list[str]:
+    data = load_json("keywords/ownership_verbs.json")
+    return data["weak_participation_verbs"]

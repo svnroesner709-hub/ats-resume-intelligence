@@ -15,5 +15,10 @@ mammoth==1.8.0
 # Synthetic test-fixture generation only (never used on real resumes)
 reportlab==4.2.5
 
+# LLM-powered scoring (career narrative, seniority, bullet quality, JD matching) --
+# optional at runtime, degrades gracefully with no ANTHROPIC_API_KEY set.
+anthropic==0.40.0
+python-dotenv==1.0.1
+
 # Tests
 pytest==8.3.4

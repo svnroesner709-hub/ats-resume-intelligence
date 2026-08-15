@@ -1,6 +1,0 @@
-{
-  "description": "Starter phrase bank for the aerospace_engine's PM specialization (Phase 7/Layer 7, not yet implemented). Distinguishes weak participation language from ownership language per the spec. Seeded, not exhaustive.",
-  "source_confidence": "E",
-  "weak_participation_verbs": ["helped", "supported", "worked with", "participated in", "assisted", "responsible for"],
-  "ownership_verbs": ["directed", "led", "owned", "drove", "delivered", "managed", "recovered", "executed", "negotiated", "restructured"]
-}

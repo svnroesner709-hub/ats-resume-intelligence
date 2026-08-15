@@ -19,19 +19,28 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from app.annotation.mapper import build_overlays
+from app.aerospace_engine.engine import run_pm_positioning
 from app.ats_engine.engine import build_docx_context, build_pdf_context, run_rules
+from app.career_engine.engine import evaluate_positioning
+from app.config import LLM_ENABLED, LLM_MODEL
 from app.document_rendering import docx_renderer, pdf_renderer
 from app.exports import json_export, stubs as export_stubs
 from app.ingestion.upload import FileTooLarge, UnsupportedFileType, store_upload
+from app.jd_matching.engine import build_requirement_coverage_matrix
+from app.keyword_engine.matcher import run_keyword_engine
+from app.llm.client import LLMCallError, LLMNotConfiguredError
 from app.models import (
     AnalysisResult,
     DocumentInfo,
+    JDMatchResult,
     PageInfo,
     PriorityBucket,
     Scores,
     TargetProfile,
 )
 from app.scoring.engine import compute_scores
+
+_NOT_CONFIGURED_NOTE = "Requires ANTHROPIC_API_KEY in .env -- see .env.example. Phases 1-5 and Keyword Coverage work without it."
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
@@ -55,6 +64,24 @@ def index():
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
+def _make_id_continuation(existing_findings):
+    """Returns a next_id() callable that continues the F### numbering used
+    by ats_engine.engine.run_rules, so IDs from later engines (keyword,
+    PM positioning, career positioning) never collide with earlier ones."""
+    start = 0
+    for f in existing_findings:
+        if f.id.startswith("F") and f.id[1:].isdigit():
+            start = max(start, int(f.id[1:]))
+
+    counter = {"n": start}
+
+    def next_id() -> str:
+        counter["n"] += 1
+        return f"F{counter['n']:03d}"
+
+    return next_id
+
+
 def _priority_lists(findings) -> tuple[list[str], list[str], list[str]]:
     must_fix = [f.id for f in findings if f.priority == PriorityBucket.MUST_FIX]
     strongly = [f.id for f in findings if f.priority == PriorityBucket.STRONGLY_RECOMMENDED]
@@ -62,12 +89,13 @@ def _priority_lists(findings) -> tuple[list[str], list[str], list[str]]:
     return must_fix, strongly, optional
 
 
-def _not_implemented_notes(scores: Scores) -> list[str]:
+def _not_implemented_notes(scores: Scores, jd_match: Optional[JDMatchResult]) -> list[str]:
     notes = []
     for score in scores.model_dump().values():
         if score["status"] != "computed":
-            notes.append(f"{score['label']}: not yet implemented.")
-    notes.append("Job-description matching (Requirement Coverage Matrix): not yet implemented.")
+            notes.append(f"{score['label']}: {score['status']} -- {score.get('explanation') or ''}".strip(" -"))
+    if jd_match is not None and jd_match.status != "computed":
+        notes.append(f"JD Requirement Coverage Matrix: {jd_match.status} -- {jd_match.explanation or ''}".strip(" -"))
     notes.append("Exports other than the JSON analysis report: not yet implemented.")
     return notes
 
@@ -120,7 +148,53 @@ async def analyze(
         pages = []
 
     findings, contact = run_rules(ctx)
-    scores = compute_scores(findings, ctx.extraction_comparison)
+
+    next_id = _make_id_continuation(findings)
+
+    # Phase 8 core: deterministic keyword coverage, always runs (free).
+    keyword_coverage, keyword_findings, relevant_keyword_categories = run_keyword_engine(ctx.full_text, target, next_id)
+    findings += keyword_findings
+
+    # Phase 7: ownership-verb scan always runs (free); LLM bullet-quality
+    # depth added internally when configured -- never raises past this call.
+    pm_positioning_data, pm_findings = run_pm_positioning(ctx.full_text, target, next_id)
+    findings += pm_findings
+
+    # Phase 6: career narrative / seniority / summary / readability --
+    # fully LLM-gated, degrades cleanly to "not configured" or "llm_error".
+    positioning_result: Optional[dict] = None
+    positioning_error: Optional[str] = None
+    if LLM_ENABLED:
+        try:
+            positioning_result, positioning_findings = evaluate_positioning(ctx.full_text, target, next_id)
+            findings += positioning_findings
+        except LLMNotConfiguredError as exc:
+            positioning_error = str(exc)
+        except LLMCallError as exc:
+            positioning_error = str(exc)
+
+    # Phase 8 JD mode: only attempted when a JD was actually pasted.
+    jd_match: Optional[JDMatchResult] = None
+    if job_description and job_description.strip():
+        if LLM_ENABLED:
+            try:
+                jd_match = build_requirement_coverage_matrix(ctx.full_text, target)
+            except (LLMNotConfiguredError, LLMCallError) as exc:
+                jd_match = JDMatchResult(status="llm_error", explanation=str(exc))
+        else:
+            jd_match = JDMatchResult(status="not yet implemented", explanation=_NOT_CONFIGURED_NOTE)
+
+    scores = compute_scores(
+        findings=findings,
+        comparison=ctx.extraction_comparison,
+        contact=contact,
+        keyword_coverage=keyword_coverage,
+        relevant_keyword_categories=relevant_keyword_categories,
+        pm_positioning_data=pm_positioning_data,
+        positioning_result=positioning_result,
+        positioning_error=positioning_error,
+        llm_model=LLM_MODEL,
+    )
     must_fix, strongly_recommended, optional_polish = _priority_lists(findings)
 
     document = DocumentInfo(
@@ -147,8 +221,10 @@ async def analyze(
         must_fix=must_fix,
         strongly_recommended=strongly_recommended,
         optional_polish=optional_polish,
-        not_yet_implemented=_not_implemented_notes(scores),
+        not_yet_implemented=_not_implemented_notes(scores, jd_match),
         overlays=overlays,
+        keyword_coverage=keyword_coverage,
+        jd_match=jd_match,
     )
 
     _ANALYSIS_CACHE[stored.file_id] = result

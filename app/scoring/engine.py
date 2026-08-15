@@ -1,82 +1,387 @@
 """
-Phase 5 scoring: only the two scores actually backed by implemented
-engines (ATS Parsing Reliability, ATS Structural Compatibility) get a real
-number. Everything else is explicitly marked "not yet implemented" --
-never a plausible-looking placeholder number. See models.ScoreValue.
+Every score is built from an explicit, named checklist (ScoreCheck) derived
+from data already computed elsewhere -- findings, extraction comparison,
+keyword matches, contact info, ownership-verb scan, LLM analysis results.
+Never a parallel re-implementation that could silently drift from the
+actual rule/finding logic that produced the underlying evidence.
+
+Where a score is naturally "percentage of checks passed" (Parsing
+Reliability, Structural Compatibility, Keyword Coverage), the shown number
+IS that percentage -- so the checklist fully explains the number, per the
+explicit request that drove this feature. Where a score is an LLM holistic
+judgment (the four LLM-backed scores), the number is the LLM's own 0-100
+rating and the checklist shows corroborating verdicts alongside it, not a
+formula that produced the number -- that distinction is stated in each
+score's explanation so the two kinds of "checklist" are never confused.
 """
 from __future__ import annotations
 
-from app.models import ExtractionComparison, Finding, FindingCategory, Scores, ScoreValue, Severity
+from app.models import (
+    ContactInfo,
+    ExtractionComparison,
+    Finding,
+    FindingCategory,
+    KeywordCoverageResult,
+    ScoreCheck,
+    Scores,
+    ScoreValue,
+    Severity,
+    SourceCitation,
+    SourceConfidence,
+)
 
-_NOT_IMPLEMENTED_NOTE = "Requires career_engine/aerospace_engine/keyword_engine, which are scaffolded but not yet implemented (see README phase status)."
+_NOT_CONFIGURED_NOTE = "Requires ANTHROPIC_API_KEY in .env -- see .env.example. Phases 1-5 and Keyword Coverage work without it."
 
 
 def _clamp(value: float) -> int:
     return max(0, min(100, round(value)))
 
 
+def _cite(rule_id: str, claim: str) -> SourceCitation:
+    return SourceCitation(
+        source="Internal ATS rule heuristic (not yet backed by a fetched citation)",
+        confidence=SourceConfidence.E,
+        claim=claim,
+        supports_rule=rule_id,
+    )
+
+
+def _llm_cite(model: str, claim: str) -> SourceCitation:
+    return SourceCitation(
+        source=f"LLM judgment (model: {model})",
+        confidence=SourceConfidence.E,
+        claim=claim,
+        supports_rule="llm_judgment",
+    )
+
+
+def _fired(findings: list[Finding], rule_id: str) -> bool:
+    return any(s.supports_rule == rule_id for f in findings for s in f.sources)
+
+
+def _has_title_containing(findings: list[Finding], category: FindingCategory, needle: str) -> bool:
+    needle = needle.lower()
+    return any(f.category == category and needle in f.title.lower() for f in findings)
+
+
+def _checks_score(checks: list[ScoreCheck]) -> int:
+    if not checks:
+        return 100
+    return _clamp(100 * sum(1 for c in checks if c.passed) / len(checks))
+
+
+# ---------------------------------------------------------------------------
+# ATS Parsing Reliability
+# ---------------------------------------------------------------------------
+
 def compute_parsing_reliability(findings: list[Finding], comparison: ExtractionComparison) -> ScoreValue:
-    score = comparison.agreement_ratio * 100
-    parsing_findings = [f for f in findings if f.category == FindingCategory.PARSING]
-    for f in parsing_findings:
-        if f.severity == Severity.RED:
-            score -= 15
-        elif f.severity == Severity.ORANGE:
-            score -= 5
-    score = _clamp(score)
+    ok_methods = [m for m in comparison.methods if m.ok]
+    checks = [
+        ScoreCheck(
+            name=f"Extraction methods agree >=90% ({', '.join(m.method for m in comparison.methods)})",
+            passed=comparison.agreement_ratio >= 0.9,
+            detail=f"{comparison.agreement_ratio * 100:.0f}% pairwise text similarity across {len(ok_methods)} method(s).",
+            source=_cite("extraction_disagreement", "Independent-method text disagreement predicts inconsistent results across real ATS platforms."),
+        ),
+        ScoreCheck(
+            name="All extraction methods succeeded",
+            passed=len(ok_methods) == len(comparison.methods),
+            detail=f"{len(ok_methods)}/{len(comparison.methods)} method(s) completed without error.",
+            source=_cite("extraction_disagreement", "A parser that cannot read the file at all is a hard failure signal."),
+        ),
+        ScoreCheck(
+            name="No garbled or undecodable characters",
+            passed=not any("unrecognized/undecodable" in d or "control character" in d for d in comparison.divergences),
+            detail="No U+FFFD replacement characters or stray control characters found in extracted text.",
+            source=_cite("extraction_disagreement", "Garbled characters mean an ATS stores corrupted text for that region."),
+        ),
+        ScoreCheck(
+            name="No method recovered substantially less text than others",
+            passed=not any("recovered only" in d for d in comparison.divergences),
+            detail="No extraction method returned <50% of the characters another method recovered.",
+            source=_cite("extraction_disagreement", "A large char-count gap between methods usually means missing content (image, text box, or a method-specific parsing failure)."),
+        ),
+        ScoreCheck(
+            name="No page without an extractable text layer",
+            passed=not any(f.category == FindingCategory.PARSING and "no extractable text layer" in f.title.lower() for f in findings),
+            detail="No page detected as image-only/scanned with zero underlying text.",
+            source=_cite("image_only_page", "A page with no text layer cannot be read by any text-based ATS parser at all."),
+        ),
+    ]
+    score = _checks_score(checks)
     return ScoreValue(
         value=score,
         label="ATS Parsing Reliability",
         status="computed",
-        explanation=(
-            f"Based on {len(comparison.methods)}-method extraction agreement "
-            f"({comparison.agreement_ratio * 100:.0f}%) and {len(parsing_findings)} parsing finding(s)."
-        ),
+        explanation=f"Percentage of {len(checks)} named parsing checks passed (see checklist) -- this number IS the pass rate, not a separate formula.",
+        checks=checks,
     )
 
 
-def compute_structural_compatibility(findings: list[Finding]) -> ScoreValue:
-    relevant_categories = {
-        FindingCategory.STRUCTURE,
-        FindingCategory.CONTACT_INFO,
-        FindingCategory.SECTION_ARCHITECTURE,
-        FindingCategory.TYPOGRAPHY,
-        FindingCategory.MICRO_FORMATTING,
-    }
-    relevant = [f for f in findings if f.category in relevant_categories]
-    score = 100.0
-    for f in relevant:
-        if f.severity == Severity.RED:
-            score -= 25
-        elif f.severity == Severity.ORANGE:
-            score -= 10
-        elif f.severity == Severity.YELLOW:
-            score -= 3
-    score = _clamp(score)
+# ---------------------------------------------------------------------------
+# ATS Structural Compatibility
+# ---------------------------------------------------------------------------
+
+def compute_structural_compatibility(findings: list[Finding], contact: ContactInfo) -> ScoreValue:
+    checks = [
+        ScoreCheck(
+            name="Single-column layout",
+            passed=not _fired(findings, "multi_column"),
+            detail="No multi-column layout detected." if not _fired(findings, "multi_column") else "Multi-column layout detected -- see finding.",
+            source=_cite("multi_column", "Some ATS parsers read across columns rather than down them, scrambling reading order."),
+        ),
+        ScoreCheck(
+            name="No tables in resume body",
+            passed=not _fired(findings, "tables"),
+            detail="No table detected." if not _fired(findings, "tables") else "One or more tables detected -- see finding.",
+            source=_cite("tables", "Tabular layouts are inconsistently parsed by some ATS configurations."),
+        ),
+        ScoreCheck(
+            name="No content outside normal text flow (text boxes)",
+            passed=not _fired(findings, "text_boxes"),
+            detail="No text-box content detected." if not _fired(findings, "text_boxes") else "Content found in a text box -- see finding.",
+            source=_cite("text_boxes", "Text-box content sits outside the normal document flow most parsers read."),
+        ),
+        ScoreCheck(
+            name="No hidden or white-on-white text",
+            passed=not _fired(findings, "hidden_text"),
+            detail="No hidden/white text detected." if not _fired(findings, "hidden_text") else "Hidden or white-on-white text detected -- see finding.",
+            source=_cite("hidden_text", "Hidden text reads as an attempt to game keyword matching."),
+        ),
+        ScoreCheck(
+            name="Standard/recognized font family used",
+            passed=not _fired(findings, "uncommon_font"),
+            detail="All fonts on the recognized safe list." if not _fired(findings, "uncommon_font") else "Uncommon font(s) detected -- see finding.",
+            source=_cite("uncommon_font", "Uncommon fonts occasionally substitute or extract poorly in some converters."),
+        ),
+        ScoreCheck(
+            name="Contact info present in main body (not header/footer only)",
+            passed=not contact.found_in_header_or_footer,
+            detail="Contact info found in the main body." if not contact.found_in_header_or_footer else "Contact info found only in a header/footer region -- see finding.",
+            source=_cite("header_footer_contact", "Some ATS parsers skip header/footer regions entirely."),
+        ),
+        ScoreCheck(
+            name="Email address extracted",
+            passed=contact.email is not None,
+            detail=f"Email: {contact.email}" if contact.email else "No email address could be extracted.",
+            source=_cite("missing_contact_field", "Most ATS platforms build the candidate record from parsed contact fields."),
+        ),
+        ScoreCheck(
+            name="Phone number extracted",
+            passed=contact.phone is not None,
+            detail=f"Phone: {contact.phone}" if contact.phone else "No phone number could be extracted.",
+            source=_cite("missing_contact_field", "Most ATS platforms build the candidate record from parsed contact fields."),
+        ),
+        ScoreCheck(
+            name="'Experience' section heading present",
+            passed=not _has_title_containing(findings, FindingCategory.SECTION_ARCHITECTURE, "experience"),
+            detail="Heading detected." if not _has_title_containing(findings, FindingCategory.SECTION_ARCHITECTURE, "experience") else "No clearly labeled Experience heading detected.",
+            source=_cite("missing_section_heading", "ATS platforms often bucket content into fields using recognized section headings."),
+        ),
+        ScoreCheck(
+            name="'Education' section heading present",
+            passed=not _has_title_containing(findings, FindingCategory.SECTION_ARCHITECTURE, "education"),
+            detail="Heading detected." if not _has_title_containing(findings, FindingCategory.SECTION_ARCHITECTURE, "education") else "No clearly labeled Education heading detected.",
+            source=_cite("missing_section_heading", "ATS platforms often bucket content into fields using recognized section headings."),
+        ),
+        ScoreCheck(
+            name="'Skills' section heading present",
+            passed=not _has_title_containing(findings, FindingCategory.SECTION_ARCHITECTURE, "skills"),
+            detail="Heading detected." if not _has_title_containing(findings, FindingCategory.SECTION_ARCHITECTURE, "skills") else "No clearly labeled Skills heading detected.",
+            source=_cite("missing_section_heading", "ATS platforms often bucket content into fields using recognized section headings."),
+        ),
+    ]
+    score = _checks_score(checks)
     return ScoreValue(
         value=score,
         label="ATS Structural Compatibility",
         status="computed",
-        explanation=f"Based on {len(relevant)} structural/contact/section finding(s) across the document.",
+        explanation=f"Percentage of {len(checks)} named structural checks passed (see checklist) -- this number IS the pass rate, not a separate formula.",
+        checks=checks,
     )
 
 
-def _not_implemented(label: str) -> ScoreValue:
-    return ScoreValue(value=None, label=label, status="not yet implemented", explanation=_NOT_IMPLEMENTED_NOTE)
+# ---------------------------------------------------------------------------
+# Aerospace Keyword Coverage (deterministic, always computed)
+# ---------------------------------------------------------------------------
+
+def compute_keyword_coverage(coverage: KeywordCoverageResult, relevant_keys: set[str]) -> ScoreValue:
+    relevant = [c for c in coverage.categories if c.category in relevant_keys] or coverage.categories
+    checks = [
+        ScoreCheck(
+            name=f"{c.label} terminology present",
+            passed=c.coverage_ratio >= 0.15,
+            detail=f"{c.matched_terms}/{c.total_terms} tracked terms matched ({c.coverage_ratio * 100:.0f}%).",
+            source=_cite("keyword_coverage", "Coverage against a curated aerospace/defense/PM/manufacturing/certification/government-contracting term database."),
+        )
+        for c in relevant
+    ]
+    score = _clamp(100 * sum(c.coverage_ratio for c in relevant) / len(relevant)) if relevant else None
+    enrichment_note = " Includes an LLM semantic-enrichment pass." if coverage.llm_enrichment_ran else " Dictionary matching only (LLM enrichment not run)."
+    return ScoreValue(
+        value=score,
+        label="Aerospace Keyword Coverage",
+        status="computed",
+        explanation=(
+            f"Average term-coverage ratio across {len(relevant)} domain categor{'y' if len(relevant) == 1 else 'ies'} "
+            f"relevant to the stated target/industry.{enrichment_note} A low score means the resume doesn't name much "
+            f"domain terminology explicitly -- not that the underlying experience is weak."
+        ),
+        checks=checks,
+    )
 
 
-def compute_scores(findings: list[Finding], comparison: ExtractionComparison) -> Scores:
+# ---------------------------------------------------------------------------
+# Program Management Positioning (deterministic ownership scan, +LLM depth)
+# ---------------------------------------------------------------------------
+
+def compute_pm_positioning(pm_data: dict) -> ScoreValue:
+    ratio = pm_data.get("ownership_ratio")
+    if ratio is None and not pm_data.get("llm_ran"):
+        return ScoreValue(value=None, label="Program Management Positioning", status="not yet implemented",
+                           explanation="No bullet-style lines were detected to scan for ownership language.")
+
+    checks = []
+    if ratio is not None:
+        checks.append(
+            ScoreCheck(
+                name="More ownership language than weak-participation language",
+                passed=ratio > 0.5,
+                detail=f"{pm_data['ownership_count']} ownership-verb line(s) vs. {pm_data['weak_count']} weak-participation line(s) ({ratio * 100:.0f}% ownership).",
+                source=_cite("ownership_language_scan", "Program-management resumes should show ownership of outcomes, not just participation."),
+            )
+        )
+
+    bullets = pm_data.get("bullets") or []
+    llm_component = None
+    if pm_data.get("llm_ran") and bullets:
+        avgs = []
+        for b in bullets:
+            dims = [b.get(k, 0) for k in ("ownership_score", "specificity_score", "scope_score", "technical_context_score", "metric_strength_score", "outcome_score")]
+            avgs.append(sum(dims) / len(dims))
+        llm_component = sum(avgs) / len(avgs) * 10  # 0-10 -> 0-100
+        checks.append(
+            ScoreCheck(
+                name="Bullets show strong Action+Scope+Technical Context+Result (LLM-scored)",
+                passed=llm_component >= 60,
+                detail=f"Averaged {llm_component / 10:.1f}/10 across {len(bullets)} scored bullet(s).",
+                source=SourceCitation(source="LLM judgment", confidence=SourceConfidence.E, claim="Per-bullet quality scoring.", supports_rule="llm_judgment"),
+            )
+        )
+
+    if ratio is not None and llm_component is not None:
+        score = _clamp((ratio * 100 + llm_component) / 2)
+        explanation = "Average of the deterministic ownership-language ratio and the LLM's per-bullet quality scoring."
+    elif llm_component is not None:
+        score = _clamp(llm_component)
+        explanation = "LLM per-bullet quality scoring (no bullet-style lines found for the deterministic verb scan)."
+    else:
+        score = _clamp(ratio * 100)
+        explanation = "Deterministic ownership-vs-weak-participation verb ratio only (set ANTHROPIC_API_KEY for LLM-scored bullet depth)."
+
+    return ScoreValue(value=score, label="Program Management Positioning", status="computed", explanation=explanation, checks=checks)
+
+
+# ---------------------------------------------------------------------------
+# LLM-only scores: Target Role Alignment, Recruiter Readability,
+# Executive/Seniority Signal (all sourced from one positioning_result dict)
+# ---------------------------------------------------------------------------
+
+def _llm_gated_score(label: str, positioning_result: dict | None, positioning_error: str | None,
+                      value_key: str, rationale_key: str, extra_checks: list[ScoreCheck]) -> ScoreValue:
+    if positioning_result is None:
+        status = "llm_error" if positioning_error else "not yet implemented"
+        return ScoreValue(value=None, label=label, status=status, explanation=positioning_error or _NOT_CONFIGURED_NOTE)
+    return ScoreValue(
+        value=_clamp(positioning_result.get(value_key, 0)),
+        label=label,
+        status="computed",
+        explanation=positioning_result.get(rationale_key, ""),
+        checks=extra_checks,
+    )
+
+
+def compute_target_role_alignment(positioning_result: dict | None, positioning_error: str | None, model: str) -> ScoreValue:
+    checks = []
+    if positioning_result:
+        checks.append(ScoreCheck(
+            name="Implied role matches target",
+            passed=positioning_result.get("role_alignment_score", 0) >= 70,
+            detail=f"Implied role: {positioning_result.get('implied_role', 'unclear')}.",
+            source=_llm_cite(model, "Implied-role classification vs. target."),
+        ))
+    return _llm_gated_score("Target Role Alignment", positioning_result, positioning_error, "role_alignment_score", "role_alignment_rationale", checks)
+
+
+def compute_recruiter_readability(positioning_result: dict | None, positioning_error: str | None, model: str) -> ScoreValue:
+    checks = []
+    if positioning_result:
+        checks.append(ScoreCheck(
+            name="Narrative answers 'what does this person do?' in one clear read",
+            passed=bool(positioning_result.get("narrative_sentence")),
+            detail=positioning_result.get("narrative_sentence", ""),
+            source=_llm_cite(model, "One-sentence narrative extraction."),
+        ))
+    return _llm_gated_score("Recruiter Readability", positioning_result, positioning_error, "recruiter_readability_score", "recruiter_readability_rationale", checks)
+
+
+def compute_seniority_signal(positioning_result: dict | None, positioning_error: str | None, model: str) -> ScoreValue:
+    checks = []
+    if positioning_result:
+        checks.append(ScoreCheck(
+            name="Wording calibrated to demonstrated scope (neither undersold nor oversold)",
+            passed=positioning_result.get("seniority_calibration") == "matches",
+            detail=f"Calibration verdict: {positioning_result.get('seniority_calibration', 'unclear')}.",
+            source=_llm_cite(model, "Seniority calibration judgment."),
+        ))
+    return _llm_gated_score("Executive/Seniority Signal", positioning_result, positioning_error, "seniority_score", "seniority_rationale", checks)
+
+
+def compute_overall(scores: dict[str, ScoreValue]) -> ScoreValue:
+    computed = {k: v for k, v in scores.items() if v.status == "computed" and v.value is not None}
+    if not computed:
+        return ScoreValue(value=None, label="Overall Resume Strength", status="not yet implemented", explanation=_NOT_CONFIGURED_NOTE)
+    avg = sum(v.value for v in computed.values()) / len(computed)
+    return ScoreValue(
+        value=_clamp(avg),
+        label="Overall Resume Strength",
+        status="computed",
+        explanation=(
+            f"Unweighted average of {len(computed)}/{len(scores)} sub-scores currently computed "
+            f"({', '.join(v.label for v in computed.values())}). A diagnostic index, not a precise measurement -- "
+            f"and it understates completeness while any sub-scores remain unconfigured."
+        ),
+    )
+
+
+def compute_scores(
+    findings: list[Finding],
+    comparison: ExtractionComparison,
+    contact: ContactInfo,
+    keyword_coverage: KeywordCoverageResult,
+    relevant_keyword_categories: set[str],
+    pm_positioning_data: dict,
+    positioning_result: dict | None,
+    positioning_error: str | None,
+    llm_model: str,
+) -> Scores:
     parsing = compute_parsing_reliability(findings, comparison)
-    structural = compute_structural_compatibility(findings)
-    return Scores(
-        ats_parsing_reliability=parsing,
-        ats_structural_compatibility=structural,
-        target_role_alignment=_not_implemented("Target Role Alignment"),
-        aerospace_keyword_coverage=_not_implemented("Aerospace Keyword Coverage"),
-        program_management_positioning=_not_implemented("Program Management Positioning"),
-        recruiter_readability=_not_implemented("Recruiter Readability"),
-        executive_seniority_signal=_not_implemented("Executive/Seniority Signal"),
-        # "Overall" is only meaningful once the career/keyword engines exist;
-        # a partial average would misleadingly look like a real composite.
-        overall_resume_strength=_not_implemented("Overall Resume Strength"),
-    )
+    structural = compute_structural_compatibility(findings, contact)
+    keyword = compute_keyword_coverage(keyword_coverage, relevant_keyword_categories)
+    pm_positioning = compute_pm_positioning(pm_positioning_data)
+    role_alignment = compute_target_role_alignment(positioning_result, positioning_error, llm_model)
+    readability = compute_recruiter_readability(positioning_result, positioning_error, llm_model)
+    seniority = compute_seniority_signal(positioning_result, positioning_error, llm_model)
+
+    partial = {
+        "ats_parsing_reliability": parsing,
+        "ats_structural_compatibility": structural,
+        "target_role_alignment": role_alignment,
+        "aerospace_keyword_coverage": keyword,
+        "program_management_positioning": pm_positioning,
+        "recruiter_readability": readability,
+        "executive_seniority_signal": seniority,
+    }
+    overall = compute_overall(partial)
+
+    return Scores(**partial, overall_resume_strength=overall)

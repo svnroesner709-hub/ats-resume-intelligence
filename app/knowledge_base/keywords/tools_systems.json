@@ -1,0 +1,33 @@
+{
+  "category": "tools_systems",
+  "label": "Tools & Systems",
+  "description": "Named software tools commonly listed by program management, engineering, and manufacturing candidates in this domain.",
+  "source_confidence": "E",
+  "note": "Compiled from domain knowledge, not yet backed by a live-fetched citation. Phase 9 (app/research/) will upgrade sourcing.",
+  "terms": [
+    {"term": "Primavera P6", "abbreviations": ["P6"], "synonyms": []},
+    {"term": "Microsoft Project", "abbreviations": ["MS Project"], "synonyms": []},
+    {"term": "SAP", "abbreviations": [], "synonyms": ["SAP ERP"]},
+    {"term": "Oracle ERP", "abbreviations": [], "synonyms": []},
+    {"term": "Deltek Costpoint", "abbreviations": ["Costpoint"], "synonyms": []},
+    {"term": "Jira", "abbreviations": [], "synonyms": []},
+    {"term": "Confluence", "abbreviations": [], "synonyms": []},
+    {"term": "Windchill", "abbreviations": [], "synonyms": ["PTC Windchill"]},
+    {"term": "Teamcenter", "abbreviations": [], "synonyms": ["Siemens Teamcenter"]},
+    {"term": "CATIA", "abbreviations": [], "synonyms": []},
+    {"term": "SolidWorks", "abbreviations": [], "synonyms": []},
+    {"term": "ANSYS", "abbreviations": [], "synonyms": []},
+    {"term": "MATLAB", "abbreviations": [], "synonyms": ["Simulink"]},
+    {"term": "DOORS", "abbreviations": [], "synonyms": ["IBM DOORS", "requirements management tool"]},
+    {"term": "Agile", "abbreviations": [], "synonyms": ["Scrum", "Scaled Agile", "SAFe"]},
+    {"term": "Kanban board", "abbreviations": [], "synonyms": []},
+    {"term": "SharePoint", "abbreviations": [], "synonyms": []},
+    {"term": "Tableau", "abbreviations": [], "synonyms": []},
+    {"term": "Power BI", "abbreviations": [], "synonyms": []},
+    {"term": "Salesforce", "abbreviations": [], "synonyms": []},
+    {"term": "ServiceNow", "abbreviations": [], "synonyms": []},
+    {"term": "Smartsheet", "abbreviations": [], "synonyms": []},
+    {"term": "AutoCAD", "abbreviations": [], "synonyms": []},
+    {"term": "NX", "abbreviations": [], "synonyms": ["Siemens NX"]}
+  ]
+}
