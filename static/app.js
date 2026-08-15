@@ -33,7 +33,7 @@ fileInput.addEventListener("change", () => {
 function setFile(file) {
   const okExt = /\.(pdf|docx)$/i.test(file.name);
   if (!okExt) {
-    alert("Only .pdf and .docx files are supported.");
+    showUploadError("Only .pdf and .docx files are supported.");
     return;
   }
   state.file = file;
@@ -45,6 +45,7 @@ function setFile(file) {
 
 analyzeBtn.addEventListener("click", async () => {
   if (!state.file) return;
+  clearUploadError();
   analyzeBtn.disabled = true;
   analyzeBtn.textContent = "Analyzing...";
 
@@ -67,12 +68,38 @@ analyzeBtn.addEventListener("click", async () => {
     const result = await resp.json();
     render(result); // render() sets state.result itself
   } catch (e) {
-    alert("Error: " + e.message);
+    // A dead/unreachable server surfaces here as "Failed to fetch" --
+    // give that case its own clearer message rather than the raw browser string.
+    const isNetworkError = e instanceof TypeError;
+    const message = isNetworkError
+      ? "Could not reach the server. Is the FastAPI app still running (uvicorn app.main:app)?"
+      : e.message;
+    showUploadError("Analysis failed: " + message);
   } finally {
     analyzeBtn.disabled = false;
     analyzeBtn.textContent = "Analyze Resume";
   }
 });
+
+// Inline error banner -- deliberately NOT alert(): some browsers/embedded
+// webviews suppress native dialogs entirely, which made a dead server look
+// like "the button does nothing" instead of a visible error.
+function showUploadError(message) {
+  let banner = document.getElementById("upload-error");
+  if (!banner) {
+    banner = document.createElement("div");
+    banner.id = "upload-error";
+    banner.className = "upload-error";
+    dropzone.insertAdjacentElement("afterend", banner);
+  }
+  banner.textContent = message;
+  banner.style.display = "block";
+}
+
+function clearUploadError() {
+  const banner = document.getElementById("upload-error");
+  if (banner) banner.style.display = "none";
+}
 
 // ---------- Rendering ----------
 
