@@ -1,0 +1,12 @@
+{
+  "description": "SCHEMA TEMPLATE for the source-record format the spec requires for every externally-validated recommendation (Phase 9 / research/ module, not yet implemented). The entry below is a PLACEHOLDER showing the required shape -- it is NOT a real fetched citation and must not be presented to a user as one. Real entries get added only after an actual WebFetch/WebSearch lookup, with a genuine URL and date_accessed.",
+  "example_entry_is_placeholder_only": true,
+  "example": {
+    "source": "(placeholder) Example Recruiting Platform Help Center",
+    "url": null,
+    "date_accessed": null,
+    "claim": "(placeholder) Example claim text goes here once a real source is fetched.",
+    "confidence": "E",
+    "supports_rule": "multi_column"
+  }
+}

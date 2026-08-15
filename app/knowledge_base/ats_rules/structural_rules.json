@@ -1,0 +1,45 @@
+{
+  "description": "Per-rule metadata (why it matters + source citation) attached to Finding objects produced by app/ats_engine/rules_structure.py and rules_sections.py. IMPORTANT: none of these are backed by a live-fetched citation yet -- confidence is honestly set to E (internal heuristic) across the board. Phase 9 (app/research/) is where real WebFetch-sourced citations with an actual URL and date-accessed get attached, replacing these placeholders one rule at a time. Do not upgrade a rule's confidence level without a real source recorded here.",
+  "rules": {
+    "multi_column": {
+      "why_it_matters": "Multi-column layouts are commonly cited as an ATS risk because some parsers read left-to-right across the full page width rather than down one column before the next, interleaving unrelated content (e.g. a date from the right column landing mid-sentence in the left column's job description).",
+      "confidence": "E"
+    },
+    "tables": {
+      "why_it_matters": "Tabular layouts are commonly cited as inconsistently parsed by older ATS configurations -- cell contents can be dropped, merged, or read out of the intended row/column order.",
+      "confidence": "E"
+    },
+    "text_boxes": {
+      "why_it_matters": "Text placed in a floating text box/shape sits outside the normal document text flow. Many parsers extract only the main flow, so text-box content can be invisible to the ATS even though it is fully visible to a human reader.",
+      "confidence": "E"
+    },
+    "hidden_text": {
+      "why_it_matters": "Hidden (w:vanish) or white-on-white text is invisible to a human reviewer opening the file normally. If an ATS or a recruiter later opens the raw text, this reads as an attempt to game keyword matching, which is a credibility/integrity risk independent of whether it helps parsing.",
+      "confidence": "E"
+    },
+    "header_footer_contact": {
+      "why_it_matters": "Contact information placed only in a document header or footer is commonly cited as being skipped by some ATS text-extraction configurations, which read the main body content and may ignore header/footer regions entirely.",
+      "confidence": "E"
+    },
+    "image_only_page": {
+      "why_it_matters": "A page with no extractable text layer (a scanned image or a flattened/rasterized page) cannot be read by any text-based ATS parser at all -- this is the highest-confidence structural risk this engine can flag, and it is directly observed (no text layer found) rather than inferred.",
+      "confidence": "E"
+    },
+    "extraction_disagreement": {
+      "why_it_matters": "When independent extraction methods produce substantially different text for the same document, that divergence is itself evidence of a parsing-fragile layout -- different ATS vendors use different underlying PDF/DOCX text extraction libraries, so disagreement here predicts inconsistent results across real ATS platforms.",
+      "confidence": "E"
+    },
+    "uncommon_font": {
+      "why_it_matters": "Uncommon or highly stylized fonts occasionally substitute poorly or extract with broken ligatures in some PDF-to-text converters. This is a lower-confidence, extraction-hygiene flag, not a claim that the specific font was tested.",
+      "confidence": "E"
+    },
+    "missing_section_heading": {
+      "why_it_matters": "Some ATS platforms bucket resume content into fields (experience, education, skills) using recognized section-heading text as the delimiter. A missing or unconventional heading for a standard section can mean that content is not correctly attributed to the right field.",
+      "confidence": "E"
+    },
+    "missing_contact_field": {
+      "why_it_matters": "Most ATS platforms create the candidate record from parsed contact fields (name, email, phone). A field the parser cannot find at all cannot populate that field in the ATS record, independent of layout quality elsewhere.",
+      "confidence": "E"
+    }
+  }
+}

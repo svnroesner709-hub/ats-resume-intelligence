@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS Resume Intelligence</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>ATS Resume Intelligence</h1>
+    <div class="subtitle">Deterministic parsing &amp; ATS structural analysis &mdash; foundational MVP (Phases 1&ndash;5)</div>
+  </div>
+  <button class="secondary" id="export-btn" style="width:auto; display:none;">Export JSON Report</button>
+</header>
+
+<main class="layout">
+
+  <!-- LEFT: upload + target fields -->
+  <section class="panel">
+    <h2>Upload</h2>
+    <div id="dropzone">
+      <div>Drag &amp; drop a <strong>PDF</strong> or <strong>DOCX</strong> resume here, or click to browse.</div>
+      <div id="file-name"></div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,.docx" style="display:none;">
+
+    <h2 style="margin-top:18px;">Target Role (optional)</h2>
+    <div class="field">
+      <label for="industry">Industry</label>
+      <input id="industry" placeholder="e.g. Aerospace / Defense">
+    </div>
+    <div class="field">
+      <label for="career_path">Career Path</label>
+      <input id="career_path" placeholder="e.g. Program Management">
+    </div>
+    <div class="field">
+      <label for="target_role">Target Role</label>
+      <input id="target_role" placeholder="e.g. Senior Technical Program Manager">
+    </div>
+    <div class="field">
+      <label for="seniority">Target Seniority</label>
+      <input id="seniority" placeholder="e.g. Director-track">
+    </div>
+    <div class="field">
+      <label for="target_company">Target Company</label>
+      <input id="target_company" placeholder="e.g. Northrop Grumman">
+    </div>
+    <div class="field">
+      <label for="background_notes">Background Notes</label>
+      <textarea id="background_notes" placeholder="e.g. Materials &amp; Processes, Airframe, Virgin Galactic"></textarea>
+    </div>
+    <div class="field">
+      <label for="job_description">Job Description (optional)</label>
+      <textarea id="job_description" placeholder="Paste a target job description to enable JD matching (not yet implemented in this MVP)."></textarea>
+    </div>
+
+    <button class="primary" id="analyze-btn" disabled>Analyze Resume</button>
+  </section>
+
+  <!-- CENTER: document viewer -->
+  <section class="panel" id="viewer-panel">
+    <h2>Document Viewer</h2>
+    <div id="viewer-empty">Upload a resume to see it rendered here, with ATS findings overlaid directly on the page.</div>
+    <div id="viewer-content" style="display:none;"></div>
+  </section>
+
+  <!-- RIGHT: scores + findings -->
+  <aside class="panel" id="right-panel">
+    <h2>Analysis</h2>
+    <div id="right-empty" class="empty-note">No analysis yet.</div>
+    <div id="right-content" style="display:none;">
+
+      <div class="notice" id="not-implemented-notice"></div>
+
+      <div id="scores-block"></div>
+
+      <div class="tabbar">
+        <button class="tab-btn active" data-tab="priority">Priority</button>
+        <button class="tab-btn" data-tab="all">All Findings</button>
+      </div>
+
+      <div id="tab-priority">
+        <div class="priority-section">
+          <h3><span class="priority-badge must-fix"></span> Must Fix</h3>
+          <div id="list-must-fix"></div>
+        </div>
+        <div class="priority-section">
+          <h3><span class="priority-badge strong"></span> Strongly Recommended</h3>
+          <div id="list-strong"></div>
+        </div>
+        <div class="priority-section">
+          <h3><span class="priority-badge polish"></span> Optional Polish</h3>
+          <div id="list-polish"></div>
+        </div>
+      </div>
+
+      <div id="tab-all" style="display:none;">
+        <div id="list-all"></div>
+      </div>
+
+    </div>
+  </aside>
+
+</main>
+
+<!-- Detail drawer -->
+<div id="detail-overlay">
+  <div id="detail-card"></div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

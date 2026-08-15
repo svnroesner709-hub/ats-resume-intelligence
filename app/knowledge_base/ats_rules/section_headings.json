@@ -1,0 +1,20 @@
+{
+  "description": "Canonical resume section concepts and the heading label variants recognized as matching each. Used by ats_engine.rules_sections to detect whether standard sections are present and clearly labeled. An unusual/creative heading not in this list is not automatically wrong -- it's flagged as a Possible ATS Risk / Positioning Opportunity for the recruiter-readability reason, not asserted as a parsing failure.",
+  "source_confidence": "E",
+  "note": "Not yet backed by a live-fetched citation (Phase 9 / research/ module is where real sourced URLs get attached). Restated from general, widely-repeated career-guidance convention -- treat as Level E internal heuristic until a real source is recorded.",
+  "sections": {
+    "summary": ["summary", "professional summary", "executive summary", "career summary", "profile", "objective"],
+    "experience": [
+      "experience", "professional experience", "work experience", "employment history",
+      "career history", "relevant experience", "program management experience"
+    ],
+    "education": ["education", "academic background", "education and training"],
+    "skills": [
+      "skills", "core competencies", "technical skills", "technical expertise",
+      "areas of expertise", "competencies", "tools and systems", "tools", "systems"
+    ],
+    "certifications": ["certifications", "licenses and certifications", "certifications and training"],
+    "clearance": ["security clearance", "clearance", "clearance eligibility"],
+    "achievements": ["selected achievements", "key achievements", "program highlights", "accomplishments"]
+  }
+}

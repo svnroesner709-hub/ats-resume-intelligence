@@ -1,0 +1,12 @@
+{
+  "description": "Font families widely documented as safe/standard choices by career-center and ATS-guidance sources. Absence from this list is NOT proof a font breaks extraction -- it just means the resume should get closer manual review, so findings referencing this list are capped at YELLOW severity / 'Possible ATS Risk' unless an actual extraction failure was separately observed for that document.",
+  "source_confidence": "E",
+  "note": "Not yet backed by a live-fetched citation (Phase 9 / research/ module is where real sourced URLs get attached). Restated from general, widely-repeated career-guidance convention -- treat as Level E internal heuristic until a real source is recorded.",
+  "families": [
+    "Arial", "Helvetica", "Calibri", "Cambria", "Georgia", "Times New Roman",
+    "Times", "Garamond", "Book Antiqua", "Palatino", "Verdana", "Tahoma",
+    "Trebuchet MS", "Segoe UI", "Aptos", "Source Sans Pro", "Source Sans 3",
+    "Lato", "Open Sans", "PT Sans", "Roboto", "Noto Sans", "Century Gothic",
+    "Franklin Gothic", "Consolas", "Courier New"
+  ]
+}

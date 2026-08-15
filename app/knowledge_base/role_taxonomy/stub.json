@@ -1,0 +1,4 @@
+{
+  "description": "STUB. Will hold the role taxonomy used by career_engine (Layer 5) to classify a resume's implied role (Project Manager / Program Manager / Technical Program Manager / etc.) against the user's target. Not yet implemented -- career_engine.py raises NotImplementedError.",
+  "roles": []
+}
