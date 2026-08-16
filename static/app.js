@@ -161,7 +161,21 @@ function renderViewer(result) {
       wrap.appendChild(img);
 
       const overlays = result.overlays[String(page.page_number)] || [];
+      const kwOverlays = (result.keyword_overlays && result.keyword_overlays[String(page.page_number)]) || [];
       img.addEventListener("load", () => {
+        // Keyword highlights first (underneath), so a finding box drawn on
+        // top is never obscured by a highlighter mark.
+        kwOverlays.forEach((box) => {
+          const div = document.createElement("div");
+          div.className = `kw-overlay-box ${box.via === "llm_semantic" ? "llm" : ""}`;
+          div.style.left = `${box.x0 * 100}%`;
+          div.style.top = `${box.y0 * 100}%`;
+          div.style.width = `${(box.x1 - box.x0) * 100}%`;
+          div.style.height = `${(box.y1 - box.y0) * 100}%`;
+          div.title = box.term;
+          wrap.appendChild(div);
+        });
+
         overlays.forEach((box) => {
           const div = document.createElement("div");
           div.className = `overlay-box ${box.severity}`;

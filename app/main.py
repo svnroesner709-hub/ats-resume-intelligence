@@ -18,6 +18,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
+from app.annotation.keyword_highlighter import build_pdf_keyword_overlays, highlight_docx_html
 from app.annotation.mapper import build_overlays
 from app.aerospace_engine.engine import run_pm_positioning
 from app.ats_engine.engine import build_docx_context, build_pdf_context, run_rules
@@ -60,7 +61,22 @@ _SAFE_FILE_ID_RE = re.compile(r"^[a-f0-9]{16}$")
 
 @app.get("/")
 def index():
-    return FileResponse(STATIC_DIR / "index.html")
+    return FileResponse(STATIC_DIR / "index.html", headers={"Cache-Control": "no-cache"})
+
+
+@app.middleware("http")
+async def no_cache_static(request, call_next):
+    """This is an actively-changing local dev tool -- a stale cached
+    app.js/styles.css silently serving old behavior after an edit (with no
+    error, just quietly wrong output) is a worse failure mode than the
+    negligible cost of always revalidating a few small local files. Every
+    /static/* response gets Cache-Control: no-cache (still allows a
+    conditional revalidation via ETag/Last-Modified, just never serves
+    straight from the disk cache without checking first)."""
+    response = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
 
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -157,6 +173,16 @@ async def analyze(
     keyword_coverage, keyword_findings, relevant_keyword_categories = run_keyword_engine(ctx.full_text, target, next_id)
     findings += keyword_findings
 
+    # On-document highlighting: mark exactly where each matched keyword sits
+    # on the page (PDF) or in the rendered HTML (DOCX), not just list it in
+    # the Keywords tab. PDF gets normalized overlay boxes; DOCX gets the
+    # highlight baked directly into docx_html's markup.
+    keyword_overlays: dict[str, list[dict]] = {}
+    if stored.file_type == "pdf":
+        keyword_overlays = build_pdf_keyword_overlays(stored.path, keyword_coverage.matched, pages)
+    else:
+        docx_html = highlight_docx_html(docx_html, keyword_coverage.matched)
+
     # Phase 7: ownership-verb scan always runs (free); LLM bullet-quality
     # depth added internally when configured -- never raises past this call.
     pm_positioning_data, pm_findings = run_pm_positioning(ctx.full_text, target, next_id)
@@ -241,6 +267,7 @@ async def analyze(
         optional_polish=optional_polish,
         not_yet_implemented=_not_implemented_notes(scores, jd_match),
         overlays=overlays,
+        keyword_overlays=keyword_overlays,
         keyword_coverage=keyword_coverage,
         jd_match=jd_match,
     )

@@ -61,6 +61,8 @@ Every finding and score check carries a `confidence` level (A-E, see `app/models
 
 **Bulk acronym library**: `app/knowledge_base/keywords/acronyms_bulk.txt` -- a plain-text, pipe-delimited (`category|ACRONYM|Expansion`) supplement to the richer per-term JSON files, added specifically to close coverage gaps fast (e.g. FEA, BoE were reported missing and are now in there) without JSON ceremony for every entry. ~130 acronyms across all 6 categories as of this writing; extend it directly, one line per term, no schema changes needed. Matched keyword chips in the GUI use a deliberately vibrant gradient highlight (cyan-violet for dictionary/verified matches, amber-pink for LLM-inferred ones) so what the resume actually has stands out against the muted "missing terms" list.
 
+**On-document highlighting**: matched keywords aren't just listed in the Keywords tab -- they're highlighted directly on the rendered resume, same gradient treatment. For PDF, `app/annotation/keyword_highlighter.py` uses PyMuPDF's `Page.search_for()` to find each matched term's real on-page position (case-verified for short abbreviation matches, so e.g. a case-sensitive "PT" match can't bleed into an unrelated lowercase "pt" elsewhere on the page); for DOCX, matched terms are wrapped in `<mark>` tags directly in the rendered HTML (text-node-only substitution, markup can't be corrupted). Only exact dictionary hits are highlighted this way -- an LLM-semantic match's "matched_form" is a paraphrase, not a literal quote, so there's no real page position to point at.
+
 ## Architecture
 
 ```
@@ -84,7 +86,8 @@ app/
     role_taxonomy/       17 role profiles (expected categories + signature terms) for role_alignment.py
     job_descriptions/    Real 2026-08-15 JD research sweep: structured records + methodology README
   scoring/              Builds every score's checklist from data already computed elsewhere
-  annotation/           Phase 4: Finding -> overlay geometry
+  annotation/           Phase 4: Finding -> overlay geometry + keyword_highlighter.py (on-document
+                        keyword highlighting, PDF bbox search + DOCX HTML marks)
   exports/              JSON report (implemented) + stubs for everything else
   models.py             Pydantic schema shared by backend + GUI
   main.py               FastAPI app -- orchestrates all engines, degrades LLM failures per-score
@@ -103,6 +106,7 @@ data/uploads/           gitignored -- runtime-only, never committed
 - Name extraction is a best-effort first-line heuristic, explicitly flagged as low-confidence.
 - The analysis cache (for exports) is in-memory only -- restarting the server clears it.
 - Short abbreviations (e.g. "TO" for Task order) are matched **case-sensitively** in the keyword database specifically to avoid false-positiving against common lowercase English words -- full terms/synonyms stay case-insensitive. See `app/keyword_engine/matcher.py::_forms_to_check`.
+- `/static/*` responses always carry `Cache-Control: no-cache` (see `app/main.py`'s middleware) -- this is a fast-moving local dev tool, and a browser silently serving a stale `app.js`/`styles.css` after an edit (no error, just quietly-wrong behavior) is a worse failure mode than the negligible cost of always revalidating a few small local files. If a change to `static/` ever doesn't show up, hard-refresh; if it still doesn't, the server needs restarting, not the browser cache clearing.
 - No GitHub remote has been created for this repo yet -- that's a deliberate separate step, done only when explicitly requested.
 
 ## Tests
@@ -111,4 +115,4 @@ data/uploads/           gitignored -- runtime-only, never committed
 venv\Scripts\python -m pytest -v
 ```
 
-46 tests, all free (no network calls, no API key needed). Fixtures are generated (not hand-written) by `tests/fixtures/generate_fixtures.py` -- every name/email/employer in them is fictional. `tests/test_llm_modules.py` verifies the LLM-backed modules' plumbing (Finding construction, graceful degradation) by monkeypatching `app.llm.client.call_tool` with canned responses -- it never makes a real API call.
+52 tests, all free (no network calls, no API key needed). Fixtures are generated (not hand-written) by `tests/fixtures/generate_fixtures.py` -- every name/email/employer in them is fictional. `tests/test_llm_modules.py` verifies the LLM-backed modules' plumbing (Finding construction, graceful degradation) by monkeypatching `app.llm.client.call_tool` with canned responses -- it never makes a real API call.

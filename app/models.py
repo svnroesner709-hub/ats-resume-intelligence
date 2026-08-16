@@ -271,5 +271,10 @@ class AnalysisResult(BaseModel):
     # page_number (as str, JSON dict keys must be strings) -> list of
     # normalized overlay boxes; see app/annotation/mapper.py
     overlays: dict[str, list[dict]] = Field(default_factory=dict)
+    # page_number (str) -> normalized keyword-highlight boxes, PDF only --
+    # see app/annotation/keyword_highlighter.py. DOCX highlighting is baked
+    # directly into document.docx_html's <mark> tags instead, since there's
+    # no page geometry to overlay onto.
+    keyword_overlays: dict[str, list[dict]] = Field(default_factory=dict)
     keyword_coverage: Optional[KeywordCoverageResult] = None
     jd_match: Optional[JDMatchResult] = None

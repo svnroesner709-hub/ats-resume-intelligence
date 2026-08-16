@@ -238,12 +238,34 @@ button.secondary {
 .overlay-box:hover { background: rgba(41, 82, 163, 0.22); }
 .overlay-box.selected { outline: 3px solid var(--accent); }
 
+/* On-document keyword highlights -- sit underneath the finding overlays
+   (z-index default stacking = later-appended wins, and these are appended
+   first), styled like a highlighter pen rather than a bordered box so it
+   reads as "this text is a match" rather than "click this for an issue". */
+.kw-overlay-box {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--kw-highlight-a), var(--kw-highlight-b));
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+}
+.kw-overlay-box.llm { background: linear-gradient(135deg, var(--kw-llm-a), var(--kw-llm-b)); }
+
 /* The rendered page image is always a literal snapshot of the document
    (white paper), so it's framed on a fixed light card regardless of theme
    -- like any PDF viewer, the "paper" doesn't invert. */
 #docx-view { padding: 20px; line-height: 1.5; background: #ffffff; color: #1c2230; border-radius: 6px; }
 #docx-view table { border-collapse: collapse; }
 #docx-view td, #docx-view th { border: 1px solid #dfe2e8; padding: 4px 8px; }
+#docx-view mark.kw-doc-highlight {
+  background: linear-gradient(135deg, var(--kw-highlight-a), var(--kw-highlight-b));
+  color: #ffffff;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px var(--kw-highlight-glow);
+}
 
 /* --- Scores / right panel --- */
 .score-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
