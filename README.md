@@ -17,7 +17,7 @@ Then open http://127.0.0.1:8000 in a browser, drag in a `.pdf` or `.docx` resume
 
 ## Enabling LLM-powered scoring (optional)
 
-Without any setup, the app fully works and five of the seven sub-scores are real, computed numbers -- **ATS Parsing Reliability, ATS Structural Compatibility, Aerospace Keyword Coverage** (290+ terms across 6 domain categories, 48 of them verified against real 2026-08-15 job postings -- see "Keyword database sourcing" below), **Program Management Positioning** (ownership-vs-weak-participation verb scan), **Recruiter Readability** (Bullshit/Redundancy detectors), and **Target Role Alignment** (role-taxonomy terminology fit -- type a target role like "Technical Program Manager" into the Target Role field and it scores immediately, no job description or API key required).
+Without any setup, the app fully works and five of the seven sub-scores are real, computed numbers -- **ATS Parsing Reliability, ATS Structural Compatibility, Aerospace Keyword Coverage** (400+ terms across 6 domain categories (including a bulk plain-text acronym library), 48 of them verified against real 2026-08-15 job postings -- see "Keyword database sourcing" below), **Program Management Positioning** (ownership-vs-weak-participation verb scan), **Recruiter Readability** (Bullshit/Redundancy detectors), and **Target Role Alignment** (role-taxonomy terminology fit -- type a target role like "Technical Program Manager" into the Target Role field and it scores immediately, no job description or API key required).
 
 Only **Executive/Seniority Signal** and the **JD Requirement Coverage Matrix** are fully gated behind an API key -- they need the kind of narrative judgment a deterministic rule can't approximate. To enable those, plus qualitative LLM depth layered on top of the five free scores above:
 
@@ -40,7 +40,7 @@ Each analysis with a key configured makes a small number of real Anthropic API c
 | 6 | Career narrative / seniority / summary | ✅ Implemented, **LLM-powered** -- requires `ANTHROPIC_API_KEY` (`app/career_engine/engine.py`) |
 | 6/12 | Recruiter Readability | ✅ Implemented -- deterministic Bullshit/Redundancy detectors always run free; LLM adds holistic narrative-clarity judgment on top when configured (`app/career_engine/readability_scan.py`) |
 | 7 | PM Positioning (ownership language + bullet strength) | ✅ Implemented -- deterministic ownership-verb scan always runs free; LLM adds per-bullet Action/Scope/Context/Result depth when configured (`app/aerospace_engine/`) |
-| 8 | Keyword/semantic matching | ✅ Implemented -- deterministic database (290+ terms) always runs free; optional LLM semantic-enrichment pass for near-misses (`app/keyword_engine/`) |
+| 8 | Keyword/semantic matching | ✅ Implemented -- deterministic database (400+ terms) always runs free; optional LLM semantic-enrichment pass for near-misses (`app/keyword_engine/`) |
 | 8 | JD Requirement Coverage Matrix | ✅ Implemented, **LLM-powered** -- only runs when a job description is pasted and a key is configured (`app/jd_matching/`) |
 | 9 | External research / live-sourced ATS citations | 🚧 Scaffolded, not implemented (`app/research/`) -- all current knowledge-base citations are honestly labeled Level E (internal heuristic, including the keyword database and LLM outputs) |
 | 10 | Exports & version comparison | Partial: JSON analysis report ✅. Annotated PDF, rewrite, ATS-safe/human-optimized/target-job-specific versions, and version comparison are 🚧 stubs (`app/exports/stubs.py`) |
@@ -58,6 +58,8 @@ Every computed score carries a `checks: [{name, passed, detail, source}]` list, 
 Every finding and score check carries a `confidence` level (A-E, see `app/models.py::SourceConfidence`). Most of the build is Level E ("internal heuristic, not yet backed by a fetched citation") -- deterministic rules default to this; LLM-derived findings are labeled `LLM judgment (model: ...)`, explicitly distinct from a deterministic rule. `app/research/` (live ATS-behavior citations) is still a stub, so no finding claims Level A/B.
 
 **Exception: 48 keyword-database terms are Level C** ("large aggregated corpus of current job postings"), from a real 2026-08-15 research sweep of Anduril, Rocket Lab, Impulse Space, SpaceX, Blue Origin, Boeing, and Hadrian postings -- see `app/knowledge_base/job_descriptions/README.md` for full methodology and honest yield, and `scripts/apply_jd_sweep.py` for the reviewable diff it applied. Matched keywords backed this way show a ✓ badge in the GUI's Keywords tab with the real source (company, role, URL) in the tooltip; everything else in the keyword database stays Level E until a term is independently confirmed the same way.
+
+**Bulk acronym library**: `app/knowledge_base/keywords/acronyms_bulk.txt` -- a plain-text, pipe-delimited (`category|ACRONYM|Expansion`) supplement to the richer per-term JSON files, added specifically to close coverage gaps fast (e.g. FEA, BoE were reported missing and are now in there) without JSON ceremony for every entry. ~130 acronyms across all 6 categories as of this writing; extend it directly, one line per term, no schema changes needed. Matched keyword chips in the GUI use a deliberately vibrant gradient highlight (cyan-violet for dictionary/verified matches, amber-pink for LLM-inferred ones) so what the resume actually has stands out against the muted "missing terms" list.
 
 ## Architecture
 
@@ -78,7 +80,7 @@ app/
   config.py             .env loading, LLM_ENABLED / LLM_MODEL
   research/             Stub -- Phase 9
   knowledge_base/       JSON-backed rule/term seed data
-    keywords/            290+ term database, 48 Level C (see job_descriptions/)
+    keywords/            400+ term database (incl. bulk acronym library), 48 Level C (see job_descriptions/)
     role_taxonomy/       17 role profiles (expected categories + signature terms) for role_alignment.py
     job_descriptions/    Real 2026-08-15 JD research sweep: structured records + methodology README
   scoring/              Builds every score's checklist from data already computed elsewhere
@@ -109,4 +111,4 @@ data/uploads/           gitignored -- runtime-only, never committed
 venv\Scripts\python -m pytest -v
 ```
 
-44 tests, all free (no network calls, no API key needed). Fixtures are generated (not hand-written) by `tests/fixtures/generate_fixtures.py` -- every name/email/employer in them is fictional. `tests/test_llm_modules.py` verifies the LLM-backed modules' plumbing (Finding construction, graceful degradation) by monkeypatching `app.llm.client.call_tool` with canned responses -- it never makes a real API call.
+46 tests, all free (no network calls, no API key needed). Fixtures are generated (not hand-written) by `tests/fixtures/generate_fixtures.py` -- every name/email/employer in them is fictional. `tests/test_llm_modules.py` verifies the LLM-backed modules' plumbing (Finding construction, graceful degradation) by monkeypatching `app.llm.client.call_tool` with canned responses -- it never makes a real API call.

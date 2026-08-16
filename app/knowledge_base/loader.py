@@ -73,12 +73,42 @@ class KeywordCategory:
     default_confidence: str = "E"
 
 
+BULK_ACRONYM_FILE = "keywords/acronyms_bulk.txt"
+
+
+def _load_bulk_acronyms() -> dict[str, list[KeywordTerm]]:
+    """Parses the plain-text bulk acronym library (category|ACRONYM|Expansion
+    per line) into KeywordTerm objects, keyed by category. Kept as a flat
+    text file rather than JSON specifically so it's fast to bulk-extend --
+    see the file's own header comment."""
+    path = KB_ROOT / BULK_ACRONYM_FILE
+    by_category: dict[str, list[KeywordTerm]] = {}
+    if not path.exists():
+        return by_category
+
+    with open(path, "r", encoding="utf-8") as f:
+        for line_num, raw_line in enumerate(f, start=1):
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split("|")
+            if len(parts) != 3:
+                continue  # tolerate malformed lines rather than crash the app on a typo
+            category_key, acronym, expansion = (p.strip() for p in parts)
+            by_category.setdefault(category_key, []).append(
+                KeywordTerm(term=expansion, abbreviations=[acronym], synonyms=[])
+            )
+    return by_category
+
+
 @functools.lru_cache(maxsize=None)
 def keyword_database() -> tuple[KeywordCategory, ...]:
     """The full aerospace/defense/PM/manufacturing/certification/government-
-    contracting/tools keyword database (app/knowledge_base/keywords/*.json),
-    used by app/keyword_engine/matcher.py. Returns a tuple (not a list) so
-    the lru_cache-returned value can't be accidentally mutated by callers."""
+    contracting/tools keyword database (app/knowledge_base/keywords/*.json
+    plus the bulk acronym text file), used by app/keyword_engine/matcher.py.
+    Returns a tuple (not a list) so the lru_cache-returned value can't be
+    accidentally mutated by callers."""
+    bulk_by_category = _load_bulk_acronyms()
     categories = []
     for rel_path in KEYWORD_CATEGORY_FILES:
         data = load_json(rel_path)
@@ -93,6 +123,11 @@ def keyword_database() -> tuple[KeywordCategory, ...]:
             )
             for t in data["terms"]
         ]
+        existing_names = {t.term.lower() for t in terms}
+        for bulk_term in bulk_by_category.get(data["category"], []):
+            if bulk_term.term.lower() not in existing_names:
+                terms.append(bulk_term)
+                existing_names.add(bulk_term.term.lower())
         categories.append(
             KeywordCategory(key=data["category"], label=data["label"], terms=terms, default_confidence=default_confidence)
         )

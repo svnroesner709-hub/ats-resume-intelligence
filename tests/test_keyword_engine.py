@@ -78,3 +78,23 @@ def test_jd_sweep_terms_carry_level_c_sourcing():
 
     ims = next(m for m in coverage.matched if m.term == "Integrated master schedule")
     assert ims.confidence == "C"
+
+
+def test_bulk_acronym_library_terms_are_matched():
+    """Regression test: FEA and BoE were reported missing entirely from the
+    database -- both come from the plain-text bulk acronym library
+    (app/knowledge_base/keywords/acronyms_bulk.txt), not the JSON files."""
+    text = "Performed FEA on the bracket assembly and developed a BoE for the propulsion upgrade."
+    target = TargetProfile()
+    coverage, _, _ = run_keyword_engine(text, target, _next_id())
+
+    matched_terms = {m.term for m in coverage.matched}
+    assert "Finite Element Analysis" in matched_terms
+    assert "Basis of Estimate" in matched_terms
+
+
+def test_bulk_acronym_library_is_substantial():
+    from app.knowledge_base.loader import keyword_database
+
+    total_terms = sum(len(c.terms) for c in keyword_database())
+    assert total_terms >= 350, "expected the bulk acronym library to meaningfully expand database size"

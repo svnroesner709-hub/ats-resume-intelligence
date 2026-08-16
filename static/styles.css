@@ -20,6 +20,17 @@
   --info: #4a7ba6;
   --info-bg: #e9f2fa;
   --pass: #1f8a4c;
+
+  /* Vibrant highlight for matched/relevant keywords -- deliberately more
+     saturated than the rest of the palette so a relevant term actually
+     pops against the resume analysis instead of blending into the UI. */
+  --kw-highlight-a: #06b6d4;
+  --kw-highlight-b: #7c3aed;
+  --kw-highlight-text: #ffffff;
+  --kw-highlight-glow: rgba(124, 58, 237, 0.35);
+  --kw-llm-a: #f59e0b;
+  --kw-llm-b: #ec4899;
+  --kw-llm-glow: rgba(236, 72, 153, 0.35);
 }
 
 /* System preference: applies only when the user hasn't made an explicit
@@ -257,11 +268,37 @@ button.secondary {
 
 .kw-heading { font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--text-dim); margin: 14px 0 6px 0; }
 .kw-category-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
-.kw-chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
-.kw-chip { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-.kw-chip.llm { background: var(--info-bg); color: var(--info); }
-.kw-chip.missing { background: var(--chip-missing-bg); color: var(--text-dim); font-weight: 500; }
-.kw-chip.verified { background: var(--yellow-bg); color: var(--yellow); }
+.kw-chip-row { display: flex; flex-wrap: wrap; gap: 7px; }
+
+/* Matched/relevant terms: vibrant gradient, deliberately louder than the
+   rest of the UI so what the resume actually has stands out at a glance. */
+.kw-chip {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--kw-highlight-text);
+  background: linear-gradient(135deg, var(--kw-highlight-a), var(--kw-highlight-b));
+  box-shadow: 0 1px 5px var(--kw-highlight-glow);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: default;
+}
+.kw-chip:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 3px 10px var(--kw-highlight-glow); }
+
+/* LLM semantic-enrichment matches: same energy, warm gradient instead, so
+   dictionary-confirmed vs. model-inferred stays visually distinguishable
+   without either one looking like an afterthought. */
+.kw-chip.llm {
+  background: linear-gradient(135deg, var(--kw-llm-a), var(--kw-llm-b));
+  box-shadow: 0 1px 5px var(--kw-llm-glow);
+}
+.kw-chip.llm:hover { box-shadow: 0 3px 10px var(--kw-llm-glow); }
+
+.kw-chip.missing { background: var(--chip-missing-bg); color: var(--text-dim); font-weight: 500; box-shadow: none; }
+.kw-chip.missing:hover { transform: none; }
+.kw-chip.verified { outline: 2px solid rgba(255,255,255,0.55); outline-offset: -3px; }
 .kw-chip-badge { margin-right: 3px; }
 
 .jd-row { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 12px; border-left-width: 4px; }

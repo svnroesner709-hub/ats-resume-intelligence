@@ -1,0 +1,142 @@
+# Bulk acronym/terminology library. Plain-text on purpose (per explicit
+# request) so it's fast to scan and extend without JSON ceremony -- this is
+# the "quick coverage expansion" layer; the richer per-term JSON files
+# (sources, synonyms, JD-sweep Level C citations) stay the primary format
+# for terms that warrant that depth.
+#
+# Format (pipe-delimited, one term per line):
+#   category_key|ACRONYM|Full Expansion
+# category_key must match a key in keywords/*.json (aerospace_defense,
+# program_management, manufacturing_quality,
+# systems_engineering_certification, government_contracting, tools_systems).
+# Lines starting with # are comments. Blank lines ignored.
+# All entries here are Level E (internal domain-knowledge compilation, not
+# yet backed by a fetched citation) unless later cross-confirmed by a real
+# job-posting sweep the way app/knowledge_base/job_descriptions/ does for
+# the JSON-defined terms.
+
+# --- program_management ---
+program_management|BoE|Basis of Estimate
+program_management|ROM|Rough Order of Magnitude
+program_management|IPT|Integrated Product Team
+program_management|RACI|RACI Matrix (Responsible, Accountable, Consulted, Informed)
+program_management|CDRL|Contract Data Requirements List
+program_management|DID|Data Item Description
+program_management|POE|Program Office Estimate
+program_management|IBR|Integrated Baseline Review
+program_management|PMB|Performance Measurement Baseline
+program_management|CAM|Control Account Manager
+program_management|OBS|Organizational Breakdown Structure
+program_management|RAM|Responsibility Assignment Matrix
+program_management|JCL|Joint Cost and Schedule Confidence Level
+program_management|EVMS|Earned Value Management System
+program_management|KPI|Key Performance Indicator
+program_management|OKR|Objectives and Key Results
+program_management|ROI|Return on Investment
+program_management|TY$|Then-Year Dollars
+program_management|BY$|Base-Year Dollars
+program_management|POP|Period of Performance
+program_management|NTE|Not-to-Exceed
+program_management|RFQ|Request for Quote
+program_management|PWS|Performance Work Statement
+program_management|S-curve|S-Curve Cost/Schedule Performance Curve
+program_management|TCPI|To-Complete Performance Index
+program_management|VAC|Variance at Completion
+program_management|SME|Subject Matter Expert
+program_management|POC|Point of Contact
+program_management|TBD|To Be Determined
+program_management|AOP|Annual Operating Plan
+program_management|SLA|Service Level Agreement
+program_management|MOU|Memorandum of Understanding
+program_management|MOA|Memorandum of Agreement
+program_management|RASCI|RASCI Matrix
+program_management|DACI|DACI Decision Framework
+program_management|CAPEX|Capital Expenditure
+program_management|OPEX|Operating Expenditure
+
+# --- manufacturing_quality ---
+manufacturing_quality|FEA|Finite Element Analysis
+manufacturing_quality|FEM|Finite Element Method
+manufacturing_quality|CFD|Computational Fluid Dynamics
+manufacturing_quality|CAE|Computer-Aided Engineering
+manufacturing_quality|FMECA|Failure Mode Effects and Criticality Analysis
+manufacturing_quality|RCA|Root Cause Analysis
+manufacturing_quality|DOE|Design of Experiments
+manufacturing_quality|Cpk|Process Capability Index
+manufacturing_quality|Ppk|Process Performance Index
+manufacturing_quality|DVP&R|Design Verification Plan and Report
+manufacturing_quality|FRB|Failure Review Board
+manufacturing_quality|QA|Quality Assurance
+manufacturing_quality|QC|Quality Control
+manufacturing_quality|COTS|Commercial Off-The-Shelf
+manufacturing_quality|GFE|Government Furnished Equipment
+manufacturing_quality|CFE|Contractor Furnished Equipment
+manufacturing_quality|TDP|Technical Data Package
+manufacturing_quality|CoC|Certificate of Conformance
+manufacturing_quality|OQC|Outgoing Quality Control
+manufacturing_quality|IQC|Incoming Quality Control
+manufacturing_quality|FPI|Fluorescent Penetrant Inspection
+manufacturing_quality|MPI|Magnetic Particle Inspection
+manufacturing_quality|RT|Radiographic Testing
+manufacturing_quality|UT|Ultrasonic Testing
+manufacturing_quality|PT|Penetrant Testing
+manufacturing_quality|ET|Eddy Current Testing
+
+# --- systems_engineering_certification ---
+systems_engineering_certification|ICWG|Interface Control Working Group
+systems_engineering_certification|TIM|Technical Interchange Meeting
+systems_engineering_certification|SEMP|Systems Engineering Management Plan
+systems_engineering_certification|TEMP|Test and Evaluation Master Plan
+systems_engineering_certification|RVTM|Requirements Verification Traceability Matrix
+systems_engineering_certification|STR|System Test Review
+systems_engineering_certification|ORR|Operational Readiness Review
+systems_engineering_certification|FRR|Flight Readiness Review
+systems_engineering_certification|LRR|Launch Readiness Review
+systems_engineering_certification|PSR|Pre-Ship Review
+systems_engineering_certification|ATP|Acceptance Test Procedure
+systems_engineering_certification|ATR|Acceptance Test Report
+systems_engineering_certification|DVT|Design Verification Test
+systems_engineering_certification|EVT|Engineering Verification Test
+systems_engineering_certification|PVT|Production Verification Test
+systems_engineering_certification|HALT|Highly Accelerated Life Testing
+systems_engineering_certification|HASS|Highly Accelerated Stress Screening
+
+# --- government_contracting ---
+government_contracting|CAGE|Commercial and Government Entity Code
+government_contracting|UEI|Unique Entity Identifier
+government_contracting|DUNS|Data Universal Numbering System
+government_contracting|UCA|Undefinitized Contract Action
+government_contracting|T&M|Time and Materials
+government_contracting|CPIF|Cost-Plus-Incentive-Fee
+government_contracting|BAA|Broad Agency Announcement
+government_contracting|DoDI|DoD Instruction
+government_contracting|DoDD|DoD Directive
+government_contracting|FOCI|Foreign Ownership, Control, or Influence
+government_contracting|DD254|DD Form 254 Contract Security Classification Specification
+
+# --- aerospace_defense ---
+aerospace_defense|OEM|Original Equipment Manufacturer
+aerospace_defense|MRO|Maintenance, Repair, and Overhaul
+aerospace_defense|STOL|Short Takeoff and Landing
+aerospace_defense|VTOL|Vertical Takeoff and Landing
+aerospace_defense|eVTOL|Electric Vertical Takeoff and Landing
+aerospace_defense|sUAS|Small Unmanned Aircraft System
+aerospace_defense|BVLOS|Beyond Visual Line of Sight
+aerospace_defense|C4ISR|Command, Control, Communications, Computers, Intelligence, Surveillance and Reconnaissance
+aerospace_defense|RF|Radio Frequency
+aerospace_defense|LIDAR|Light Detection and Ranging
+
+# --- tools_systems ---
+tools_systems|Nastran|MSC Nastran
+tools_systems|Abaqus|Abaqus FEA Software
+tools_systems|HyperMesh|Altair HyperMesh
+tools_systems|STAR-CCM+|Siemens STAR-CCM+
+tools_systems|Femap|Siemens Femap
+tools_systems|Creo|PTC Creo
+tools_systems|Fusion 360|Autodesk Fusion 360
+tools_systems|Minitab|Minitab Statistical Software
+tools_systems|JMP|JMP Statistical Software
+tools_systems|Power Automate|Microsoft Power Automate
+tools_systems|Visio|Microsoft Visio
+tools_systems|Aras Innovator|Aras Innovator PLM
+tools_systems|Polarion|Siemens Polarion
