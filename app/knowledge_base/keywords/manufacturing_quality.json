@@ -5,50 +5,561 @@
   "source_confidence": "E",
   "note": "Compiled from domain knowledge, not yet backed by a live-fetched citation. Phase 9 (app/research/) will upgrade sourcing.",
   "terms": [
-    {"term": "AS9100", "abbreviations": [], "synonyms": []},
-    {"term": "ISO 9001", "abbreviations": [], "synonyms": []},
-    {"term": "Material Review Board", "abbreviations": ["MRB"], "synonyms": []},
-    {"term": "Nonconformance report", "abbreviations": ["NCR"], "synonyms": []},
-    {"term": "Corrective and preventive action", "abbreviations": ["CAPA"], "synonyms": []},
-    {"term": "Root cause corrective action", "abbreviations": ["RCCA"], "synonyms": ["root cause analysis"]},
-    {"term": "Failure modes and effects analysis", "abbreviations": ["FMEA"], "synonyms": []},
-    {"term": "Process FMEA", "abbreviations": ["PFMEA"], "synonyms": []},
-    {"term": "Failure Reporting Analysis and Corrective Action System", "abbreviations": ["FRACAS"], "synonyms": []},
-    {"term": "First article inspection", "abbreviations": ["FAI"], "synonyms": []},
-    {"term": "Statistical process control", "abbreviations": ["SPC"], "synonyms": []},
-    {"term": "Six Sigma", "abbreviations": [], "synonyms": ["Six Sigma Black Belt", "Six Sigma Green Belt"]},
-    {"term": "Lean manufacturing", "abbreviations": [], "synonyms": ["lean"]},
-    {"term": "Kaizen", "abbreviations": [], "synonyms": ["continuous improvement"]},
-    {"term": "5S", "abbreviations": [], "synonyms": []},
-    {"term": "Value stream mapping", "abbreviations": ["VSM"], "synonyms": []},
-    {"term": "Yield improvement", "abbreviations": [], "synonyms": []},
-    {"term": "Quality escape", "abbreviations": [], "synonyms": []},
-    {"term": "Supplier quality", "abbreviations": ["SQE"], "synonyms": ["supplier quality engineering"]},
-    {"term": "Source inspection", "abbreviations": [], "synonyms": []},
-    {"term": "Dimensional inspection", "abbreviations": [], "synonyms": []},
-    {"term": "Coordinate measuring machine", "abbreviations": ["CMM"], "synonyms": []},
-    {"term": "Non-destructive testing", "abbreviations": ["NDT", "NDI"], "synonyms": ["non-destructive inspection"]},
-    {"term": "Ultrasonic inspection", "abbreviations": [], "synonyms": []},
-    {"term": "X-ray inspection", "abbreviations": [], "synonyms": ["radiographic inspection"]},
-    {"term": "Dye penetrant inspection", "abbreviations": [], "synonyms": ["liquid penetrant inspection"]},
-    {"term": "Tooling readiness", "abbreviations": [], "synonyms": []},
-    {"term": "Production ramp", "abbreviations": [], "synonyms": ["production ramp-up"]},
-    {"term": "Takt time", "abbreviations": [], "synonyms": []},
-    {"term": "Throughput", "abbreviations": [], "synonyms": []},
-    {"term": "Capacity utilization", "abbreviations": [], "synonyms": []},
-    {"term": "Work instructions", "abbreviations": ["WI"], "synonyms": []},
-    {"term": "Traveler", "abbreviations": [], "synonyms": ["router"]},
-    {"term": "Bill of materials", "abbreviations": ["BOM"], "synonyms": []},
-    {"term": "Engineering change order", "abbreviations": ["ECO"], "synonyms": ["engineering change notice", "ECN"]},
-    {"term": "Manufacturing readiness level", "abbreviations": ["MRL"], "synonyms": []},
-    {"term": "Production readiness review", "abbreviations": ["PRR"], "synonyms": []},
-    {"term": "New product introduction", "abbreviations": ["NPI"], "synonyms": []},
-    {"term": "Dual sourcing", "abbreviations": [], "synonyms": []},
-    {"term": "Supplier concentration", "abbreviations": [], "synonyms": []},
-    {"term": "Make-vs-buy", "abbreviations": [], "synonyms": ["make or buy"]},
-    {"term": "Vendor qualification", "abbreviations": [], "synonyms": ["supplier qualification"]},
-    {"term": "Long lead item", "abbreviations": [], "synonyms": ["long lead time procurement"]},
-    {"term": "Kitting", "abbreviations": [], "synonyms": []},
-    {"term": "Just-in-time manufacturing", "abbreviations": ["JIT"], "synonyms": []}
+    {
+      "term": "AS9100",
+      "abbreviations": [],
+      "synonyms": [],
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Manufacturing Engineer, Production",
+          "url": "https://builtin.com/job/manufacturing-engineer-production/7830562",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Rocket Lab",
+          "role_title": "Manager, Mechanical Engineering",
+          "url": "https://job-boards.greenhouse.io/rocketlab/jobs/7782679003",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Blue Origin",
+          "role_title": "Launch Ops Manufacturing Engineers",
+          "url": "https://builtin.com/job/launch-ops-manufacturing-engineers-all-levels-all-shifts/8114719",
+          "date_accessed": "2026-08-15"
+        }
+      ],
+      "source_confidence": "C"
+    },
+    {
+      "term": "ISO 9001",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Material Review Board",
+      "abbreviations": [
+        "MRB"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Nonconformance report",
+      "abbreviations": [
+        "NCR"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Corrective and preventive action",
+      "abbreviations": [
+        "CAPA"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Root cause corrective action",
+      "abbreviations": [
+        "RCCA"
+      ],
+      "synonyms": [
+        "root cause analysis"
+      ]
+    },
+    {
+      "term": "Failure modes and effects analysis",
+      "abbreviations": [
+        "FMEA"
+      ],
+      "synonyms": [],
+      "sources": [
+        {
+          "company": "Boeing",
+          "role_title": "Experienced Systems Engineer",
+          "url": "https://builtin.com/job/experienced-systems-engineer/10699253",
+          "date_accessed": "2026-08-15"
+        }
+      ],
+      "source_confidence": "C"
+    },
+    {
+      "term": "Process FMEA",
+      "abbreviations": [
+        "PFMEA"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Failure Reporting Analysis and Corrective Action System",
+      "abbreviations": [
+        "FRACAS"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "First article inspection",
+      "abbreviations": [
+        "FAI"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Statistical process control",
+      "abbreviations": [
+        "SPC"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Six Sigma",
+      "abbreviations": [],
+      "synonyms": [
+        "Six Sigma Black Belt",
+        "Six Sigma Green Belt"
+      ],
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Quality Engineer, NPI",
+          "url": "https://builtin.com/job/quality-engineer-npi/10675432",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Boeing",
+          "role_title": "Experienced Supplier Program Manager",
+          "url": "https://builtin.com/job/experienced-supplier-program-manager-strategic-sourcing-supplier-development/10699257",
+          "date_accessed": "2026-08-15"
+        }
+      ],
+      "source_confidence": "C"
+    },
+    {
+      "term": "Lean manufacturing",
+      "abbreviations": [],
+      "synonyms": [
+        "lean"
+      ]
+    },
+    {
+      "term": "Kaizen",
+      "abbreviations": [],
+      "synonyms": [
+        "continuous improvement"
+      ]
+    },
+    {
+      "term": "5S",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Value stream mapping",
+      "abbreviations": [
+        "VSM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Yield improvement",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Quality escape",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Supplier quality",
+      "abbreviations": [
+        "SQE"
+      ],
+      "synonyms": [
+        "supplier quality engineering"
+      ]
+    },
+    {
+      "term": "Source inspection",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Dimensional inspection",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Coordinate measuring machine",
+      "abbreviations": [
+        "CMM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Non-destructive testing",
+      "abbreviations": [
+        "NDT",
+        "NDI"
+      ],
+      "synonyms": [
+        "non-destructive inspection"
+      ]
+    },
+    {
+      "term": "Ultrasonic inspection",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "X-ray inspection",
+      "abbreviations": [],
+      "synonyms": [
+        "radiographic inspection"
+      ]
+    },
+    {
+      "term": "Dye penetrant inspection",
+      "abbreviations": [],
+      "synonyms": [
+        "liquid penetrant inspection"
+      ]
+    },
+    {
+      "term": "Tooling readiness",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Production ramp",
+      "abbreviations": [],
+      "synonyms": [
+        "production ramp-up"
+      ]
+    },
+    {
+      "term": "Takt time",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Throughput",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Capacity utilization",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Work instructions",
+      "abbreviations": [
+        "WI"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Traveler",
+      "abbreviations": [],
+      "synonyms": [
+        "router"
+      ]
+    },
+    {
+      "term": "Bill of materials",
+      "abbreviations": [
+        "BOM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Engineering change order",
+      "abbreviations": [
+        "ECO"
+      ],
+      "synonyms": [
+        "engineering change notice",
+        "ECN"
+      ]
+    },
+    {
+      "term": "Manufacturing readiness level",
+      "abbreviations": [
+        "MRL"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Production readiness review",
+      "abbreviations": [
+        "PRR"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "New product introduction",
+      "abbreviations": [
+        "NPI"
+      ],
+      "synonyms": [],
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Quality Engineer, NPI",
+          "url": "https://builtin.com/job/quality-engineer-npi/10675432",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "SpaceX",
+          "role_title": "Supplier Development Engineer (Mechanical)",
+          "url": "https://builtin.com/job/supplier-development-engineer-mechanical-engineering/10695748",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Anduril",
+          "role_title": "Senior Manager, Manufacturing Engineering, Space",
+          "url": "https://job-boards.greenhouse.io/andurilindustries/jobs/5083648007",
+          "date_accessed": "2026-08-15"
+        }
+      ],
+      "source_confidence": "C"
+    },
+    {
+      "term": "Dual sourcing",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Supplier concentration",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Make-vs-buy",
+      "abbreviations": [],
+      "synonyms": [
+        "make or buy"
+      ]
+    },
+    {
+      "term": "Vendor qualification",
+      "abbreviations": [],
+      "synonyms": [
+        "supplier qualification"
+      ]
+    },
+    {
+      "term": "Long lead item",
+      "abbreviations": [],
+      "synonyms": [
+        "long lead time procurement"
+      ]
+    },
+    {
+      "term": "Kitting",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Just-in-time manufacturing",
+      "abbreviations": [
+        "JIT"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Geometric Dimensioning and Tolerancing",
+      "abbreviations": [
+        "GD&T"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Manufacturing Engineer, Production",
+          "url": "https://builtin.com/job/manufacturing-engineer-production/7830562",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Rocket Lab",
+          "role_title": "Manager, Mechanical Engineering",
+          "url": "https://job-boards.greenhouse.io/rocketlab/jobs/7782679003",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "SpaceX",
+          "role_title": "Supplier Development Engineer (Mechanical)",
+          "url": "https://builtin.com/job/supplier-development-engineer-mechanical-engineering/10695748",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Production Part Approval Process",
+      "abbreviations": [
+        "PPAP"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Manufacturing Engineer, Production",
+          "url": "https://builtin.com/job/manufacturing-engineer-production/7830562",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "SpaceX",
+          "role_title": "Supplier Development Engineer (Mechanical)",
+          "url": "https://builtin.com/job/supplier-development-engineer-mechanical-engineering/10695748",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Advanced Product Quality Planning",
+      "abbreviations": [
+        "APQP"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "SpaceX",
+          "role_title": "Supplier Development Engineer (Mechanical)",
+          "url": "https://builtin.com/job/supplier-development-engineer-mechanical-engineering/10695748",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "First Article Inspection Report",
+      "abbreviations": [
+        "FAIR"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Manufacturing Engineer, Production",
+          "url": "https://builtin.com/job/manufacturing-engineer-production/7830562",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "SpaceX",
+          "role_title": "Supplier Development Engineer (Mechanical)",
+          "url": "https://builtin.com/job/supplier-development-engineer-mechanical-engineering/10695748",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "8D problem solving",
+      "abbreviations": [
+        "8D"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "SpaceX",
+          "role_title": "Supplier Development Engineer (Mechanical)",
+          "url": "https://builtin.com/job/supplier-development-engineer-mechanical-engineering/10695748",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Poka-yoke",
+      "abbreviations": [],
+      "synonyms": [
+        "error-proofing",
+        "mistake-proofing"
+      ],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "SpaceX",
+          "role_title": "Manufacturing Build Engineer (Starship)",
+          "url": "https://www.themuse.com/jobs/spacex/manufacturing-build-engineer-starship",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Design for Manufacturability and Assembly",
+      "abbreviations": [
+        "DFMA",
+        "DFM"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Anduril",
+          "role_title": "Senior Manager, Manufacturing Engineering, Space",
+          "url": "https://job-boards.greenhouse.io/andurilindustries/jobs/5083648007",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "SpaceX",
+          "role_title": "Manufacturing Build Engineer (Starship)",
+          "url": "https://www.themuse.com/jobs/spacex/manufacturing-build-engineer-starship",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Hadrian",
+          "role_title": "Quality Engineer, NPI",
+          "url": "https://builtin.com/job/quality-engineer-npi/10675432",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Should-cost analysis",
+      "abbreviations": [],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Rocket Lab",
+          "role_title": "Senior Global Supply Manager I - PCBA",
+          "url": "https://builtin.com/job/senior-global-supply-manager-i/10557822",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "APICS certification",
+      "abbreviations": [],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Rocket Lab",
+          "role_title": "Senior Global Supply Manager I - PCBA",
+          "url": "https://builtin.com/job/senior-global-supply-manager-i/10557822",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Manufacturing Execution System",
+      "abbreviations": [
+        "MES"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Anduril",
+          "role_title": "Senior Manager, Manufacturing Engineering, Space",
+          "url": "https://job-boards.greenhouse.io/andurilindustries/jobs/5083648007",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    }
   ]
 }

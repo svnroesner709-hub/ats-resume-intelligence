@@ -95,6 +95,18 @@ def _dictionary_match(full_text: str, categories: tuple[KeywordCategory, ...]) -
                     hit_form = form
                     break
             if hit_form:
+                confidence = term.source_confidence or cat.default_confidence
+                sources = [
+                    SourceCitation(
+                        source=f"{s.company} job posting: {s.role_title}",
+                        url=s.url,
+                        date_accessed=s.date_accessed,
+                        claim=f"Term observed in a real, current {s.company} posting.",
+                        confidence=SourceConfidence(confidence),
+                        supports_rule="keyword_coverage_jd_sweep",
+                    )
+                    for s in term.sources
+                ]
                 matched.append(
                     MatchedKeyword(
                         term=term.term,
@@ -102,7 +114,8 @@ def _dictionary_match(full_text: str, categories: tuple[KeywordCategory, ...]) -
                         category_label=cat.label,
                         matched_form=hit_form,
                         via="dictionary",
-                        confidence=SourceConfidence.E,
+                        confidence=SourceConfidence(confidence),
+                        sources=sources,
                     )
                 )
             else:

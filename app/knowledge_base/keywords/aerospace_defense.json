@@ -5,66 +5,530 @@
   "source_confidence": "E",
   "note": "Compiled from domain knowledge, not yet backed by a live-fetched citation. Phase 9 (app/research/) will upgrade sourcing.",
   "terms": [
-    {"term": "Airframe", "abbreviations": [], "synonyms": ["fuselage structure", "structures"]},
-    {"term": "Fuselage", "abbreviations": [], "synonyms": []},
-    {"term": "Wing structure", "abbreviations": [], "synonyms": ["wing box"]},
-    {"term": "Empennage", "abbreviations": [], "synonyms": ["tail structure"]},
-    {"term": "Landing gear", "abbreviations": [], "synonyms": []},
-    {"term": "Flight controls", "abbreviations": [], "synonyms": ["flight control system", "FCS"]},
-    {"term": "Avionics", "abbreviations": [], "synonyms": []},
-    {"term": "Propulsion", "abbreviations": [], "synonyms": ["propulsion system"]},
-    {"term": "Turbofan engine", "abbreviations": [], "synonyms": ["turbofan"]},
-    {"term": "Turboprop engine", "abbreviations": [], "synonyms": ["turboprop"]},
-    {"term": "Auxiliary power unit", "abbreviations": ["APU"], "synonyms": []},
-    {"term": "Environmental control system", "abbreviations": ["ECS"], "synonyms": []},
-    {"term": "Hydraulics", "abbreviations": [], "synonyms": ["hydraulic system"]},
-    {"term": "Fuel system", "abbreviations": [], "synonyms": []},
-    {"term": "Electrical power system", "abbreviations": ["EPS"], "synonyms": []},
-    {"term": "Flight management system", "abbreviations": ["FMS"], "synonyms": []},
-    {"term": "Autopilot", "abbreviations": [], "synonyms": []},
-    {"term": "Guidance Navigation and Control", "abbreviations": ["GNC"], "synonyms": ["guidance navigation control"]},
-    {"term": "Inertial navigation system", "abbreviations": ["INS"], "synonyms": []},
-    {"term": "GPS", "abbreviations": ["GNSS"], "synonyms": ["global positioning system", "global navigation satellite system"]},
-    {"term": "Radar", "abbreviations": [], "synonyms": []},
-    {"term": "Electronic warfare", "abbreviations": ["EW"], "synonyms": []},
-    {"term": "Signals intelligence", "abbreviations": ["SIGINT"], "synonyms": []},
-    {"term": "Missile defense", "abbreviations": [], "synonyms": []},
-    {"term": "Hypersonics", "abbreviations": [], "synonyms": ["hypersonic vehicle", "hypersonic weapon"]},
-    {"term": "Scramjet", "abbreviations": [], "synonyms": ["supersonic combustion ramjet"]},
-    {"term": "Launch vehicle", "abbreviations": [], "synonyms": ["rocket", "booster"]},
-    {"term": "Satellite bus", "abbreviations": [], "synonyms": ["spacecraft bus"]},
-    {"term": "Payload integration", "abbreviations": [], "synonyms": []},
-    {"term": "Ground support equipment", "abbreviations": ["GSE"], "synonyms": []},
-    {"term": "Space Force", "abbreviations": ["USSF"], "synonyms": []},
-    {"term": "Air Force acquisition", "abbreviations": [], "synonyms": []},
-    {"term": "Naval aviation", "abbreviations": [], "synonyms": []},
-    {"term": "Rotorcraft", "abbreviations": [], "synonyms": ["helicopter", "rotary wing"]},
-    {"term": "Unmanned aerial vehicle", "abbreviations": ["UAV"], "synonyms": ["drone"]},
-    {"term": "Unmanned aircraft systems", "abbreviations": ["UAS"], "synonyms": []},
-    {"term": "Counter-UAS", "abbreviations": ["C-UAS"], "synonyms": ["counter-drone"]},
-    {"term": "Directed energy weapons", "abbreviations": ["DEW"], "synonyms": ["laser weapon system"]},
-    {"term": "Electro-optical/infrared sensors", "abbreviations": ["EO/IR"], "synonyms": []},
-    {"term": "Synthetic aperture radar", "abbreviations": ["SAR"], "synonyms": []},
-    {"term": "Command and control", "abbreviations": ["C2"], "synonyms": []},
-    {"term": "Intelligence, surveillance, reconnaissance", "abbreviations": ["ISR"], "synonyms": []},
-    {"term": "Airworthiness", "abbreviations": [], "synonyms": []},
-    {"term": "Type certificate", "abbreviations": ["TC"], "synonyms": []},
-    {"term": "Supplemental type certificate", "abbreviations": ["STC"], "synonyms": []},
-    {"term": "Military qualification", "abbreviations": [], "synonyms": ["mil-qual"]},
-    {"term": "Flight test campaign", "abbreviations": [], "synonyms": ["flight test"]},
-    {"term": "Ground test", "abbreviations": [], "synonyms": []},
-    {"term": "Structural qualification testing", "abbreviations": [], "synonyms": ["structural qual"]},
-    {"term": "Envelope expansion", "abbreviations": [], "synonyms": ["flight envelope expansion"]},
-    {"term": "Human-rated systems", "abbreviations": [], "synonyms": ["human rating", "crew rating"]},
-    {"term": "Reentry vehicle", "abbreviations": [], "synonyms": []},
-    {"term": "Thermal protection system", "abbreviations": ["TPS"], "synonyms": ["heat shield"]},
-    {"term": "Solid rocket motor", "abbreviations": ["SRM"], "synonyms": []},
-    {"term": "Liquid rocket engine", "abbreviations": [], "synonyms": []},
-    {"term": "Cryogenic propellant", "abbreviations": [], "synonyms": ["cryogenics"]},
-    {"term": "Composite structures", "abbreviations": [], "synonyms": ["carbon fiber composites"]},
-    {"term": "Titanium forgings", "abbreviations": [], "synonyms": ["titanium alloy"]},
-    {"term": "Aerospace-grade aluminum", "abbreviations": [], "synonyms": []},
-    {"term": "Specialty alloys", "abbreviations": [], "synonyms": ["superalloy"]},
-    {"term": "Materials and Processes", "abbreviations": ["M&P"], "synonyms": ["materials & processes engineering"]}
+    {
+      "term": "Airframe",
+      "abbreviations": [],
+      "synonyms": [
+        "fuselage structure",
+        "structures"
+      ]
+    },
+    {
+      "term": "Fuselage",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Wing structure",
+      "abbreviations": [],
+      "synonyms": [
+        "wing box"
+      ]
+    },
+    {
+      "term": "Empennage",
+      "abbreviations": [],
+      "synonyms": [
+        "tail structure"
+      ]
+    },
+    {
+      "term": "Landing gear",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Flight controls",
+      "abbreviations": [],
+      "synonyms": [
+        "flight control system",
+        "FCS"
+      ]
+    },
+    {
+      "term": "Avionics",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Propulsion",
+      "abbreviations": [],
+      "synonyms": [
+        "propulsion system"
+      ]
+    },
+    {
+      "term": "Turbofan engine",
+      "abbreviations": [],
+      "synonyms": [
+        "turbofan"
+      ]
+    },
+    {
+      "term": "Turboprop engine",
+      "abbreviations": [],
+      "synonyms": [
+        "turboprop"
+      ]
+    },
+    {
+      "term": "Auxiliary power unit",
+      "abbreviations": [
+        "APU"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Environmental control system",
+      "abbreviations": [
+        "ECS"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Hydraulics",
+      "abbreviations": [],
+      "synonyms": [
+        "hydraulic system"
+      ]
+    },
+    {
+      "term": "Fuel system",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Electrical power system",
+      "abbreviations": [
+        "EPS"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Flight management system",
+      "abbreviations": [
+        "FMS"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Autopilot",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Guidance Navigation and Control",
+      "abbreviations": [
+        "GNC"
+      ],
+      "synonyms": [
+        "guidance navigation control"
+      ]
+    },
+    {
+      "term": "Inertial navigation system",
+      "abbreviations": [
+        "INS"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "GPS",
+      "abbreviations": [
+        "GNSS"
+      ],
+      "synonyms": [
+        "global positioning system",
+        "global navigation satellite system"
+      ]
+    },
+    {
+      "term": "Radar",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Electronic warfare",
+      "abbreviations": [
+        "EW"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Signals intelligence",
+      "abbreviations": [
+        "SIGINT"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Missile defense",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Hypersonics",
+      "abbreviations": [],
+      "synonyms": [
+        "hypersonic vehicle",
+        "hypersonic weapon"
+      ]
+    },
+    {
+      "term": "Scramjet",
+      "abbreviations": [],
+      "synonyms": [
+        "supersonic combustion ramjet"
+      ]
+    },
+    {
+      "term": "Launch vehicle",
+      "abbreviations": [],
+      "synonyms": [
+        "rocket",
+        "booster"
+      ]
+    },
+    {
+      "term": "Satellite bus",
+      "abbreviations": [],
+      "synonyms": [
+        "spacecraft bus"
+      ]
+    },
+    {
+      "term": "Payload integration",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Ground support equipment",
+      "abbreviations": [
+        "GSE"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Space Force",
+      "abbreviations": [
+        "USSF"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Air Force acquisition",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Naval aviation",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Rotorcraft",
+      "abbreviations": [],
+      "synonyms": [
+        "helicopter",
+        "rotary wing"
+      ]
+    },
+    {
+      "term": "Unmanned aerial vehicle",
+      "abbreviations": [
+        "UAV"
+      ],
+      "synonyms": [
+        "drone"
+      ]
+    },
+    {
+      "term": "Unmanned aircraft systems",
+      "abbreviations": [
+        "UAS"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Counter-UAS",
+      "abbreviations": [
+        "C-UAS"
+      ],
+      "synonyms": [
+        "counter-drone"
+      ]
+    },
+    {
+      "term": "Directed energy weapons",
+      "abbreviations": [
+        "DEW"
+      ],
+      "synonyms": [
+        "laser weapon system"
+      ]
+    },
+    {
+      "term": "Electro-optical/infrared sensors",
+      "abbreviations": [
+        "EO/IR"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Synthetic aperture radar",
+      "abbreviations": [
+        "SAR"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Command and control",
+      "abbreviations": [
+        "C2"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Intelligence, surveillance, reconnaissance",
+      "abbreviations": [
+        "ISR"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Airworthiness",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Type certificate",
+      "abbreviations": [
+        "TC"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Supplemental type certificate",
+      "abbreviations": [
+        "STC"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Military qualification",
+      "abbreviations": [],
+      "synonyms": [
+        "mil-qual"
+      ]
+    },
+    {
+      "term": "Flight test campaign",
+      "abbreviations": [],
+      "synonyms": [
+        "flight test"
+      ]
+    },
+    {
+      "term": "Ground test",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Structural qualification testing",
+      "abbreviations": [],
+      "synonyms": [
+        "structural qual"
+      ]
+    },
+    {
+      "term": "Envelope expansion",
+      "abbreviations": [],
+      "synonyms": [
+        "flight envelope expansion"
+      ]
+    },
+    {
+      "term": "Human-rated systems",
+      "abbreviations": [],
+      "synonyms": [
+        "human rating",
+        "crew rating"
+      ]
+    },
+    {
+      "term": "Reentry vehicle",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Thermal protection system",
+      "abbreviations": [
+        "TPS"
+      ],
+      "synonyms": [
+        "heat shield"
+      ]
+    },
+    {
+      "term": "Solid rocket motor",
+      "abbreviations": [
+        "SRM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Liquid rocket engine",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Cryogenic propellant",
+      "abbreviations": [],
+      "synonyms": [
+        "cryogenics"
+      ]
+    },
+    {
+      "term": "Composite structures",
+      "abbreviations": [],
+      "synonyms": [
+        "carbon fiber composites"
+      ]
+    },
+    {
+      "term": "Titanium forgings",
+      "abbreviations": [],
+      "synonyms": [
+        "titanium alloy"
+      ]
+    },
+    {
+      "term": "Aerospace-grade aluminum",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Specialty alloys",
+      "abbreviations": [],
+      "synonyms": [
+        "superalloy"
+      ]
+    },
+    {
+      "term": "Materials and Processes",
+      "abbreviations": [
+        "M&P"
+      ],
+      "synonyms": [
+        "materials & processes engineering"
+      ]
+    },
+    {
+      "term": "Thrust vector control",
+      "abbreviations": [
+        "TVC",
+        "TVCA"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Impulse Space",
+          "role_title": "Senior GNC Engineer (Propulsive Controls)",
+          "url": "https://builtin.com/job/senior-gnc-engineer-propulsive-controls/10224372",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Reaction control system",
+      "abbreviations": [
+        "RCS"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Impulse Space",
+          "role_title": "Senior GNC Engineer (Propulsive Controls)",
+          "url": "https://builtin.com/job/senior-gnc-engineer-propulsive-controls/10224372",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Slosh modeling",
+      "abbreviations": [],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Impulse Space",
+          "role_title": "Senior GNC Engineer (Propulsive Controls)",
+          "url": "https://builtin.com/job/senior-gnc-engineer-propulsive-controls/10224372",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Turbomachinery",
+      "abbreviations": [],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Impulse Space",
+          "role_title": "Staff Turbomachinery Engineer",
+          "url": "https://builtin.com/job/staff-turbomachinery-engineer/10567235",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Combustion devices",
+      "abbreviations": [],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Rocket Lab",
+          "role_title": "Senior Combustion Devices Engineer II",
+          "url": "https://builtin.com/job/senior-combustion-devices-engineer-ii-principal-combustion-devices-engineer/3646792",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Cryogenic ground systems",
+      "abbreviations": [],
+      "synonyms": [
+        "industrial gases"
+      ],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Impulse Space",
+          "role_title": "Senior Ground Systems Engineer (Cryogenics & Industrial Gases)",
+          "url": "https://builtin.com/job/senior-ground-systems-engineer-cryogenics-industrial-gases/10224381",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Aircraft stability and control",
+      "abbreviations": [
+        "S&C"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Boeing",
+          "role_title": "Aircraft Stability & Control Engineer",
+          "url": "https://builtin.com/job/aircraft-stability-control-engineer/10387516",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    }
   ]
 }

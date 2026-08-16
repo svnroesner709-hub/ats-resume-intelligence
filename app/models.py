@@ -218,6 +218,9 @@ class MatchedKeyword(BaseModel):
     matched_form: str  # the exact term/abbreviation/synonym/quote that matched
     via: str  # "dictionary" | "llm_semantic"
     confidence: SourceConfidence = SourceConfidence.E
+    # Populated only for terms verified against the 2026-08 real-job-posting
+    # sweep (Level C); empty for the Level E baseline database.
+    sources: list[SourceCitation] = Field(default_factory=list)
 
 
 class CategoryCoverage(BaseModel):

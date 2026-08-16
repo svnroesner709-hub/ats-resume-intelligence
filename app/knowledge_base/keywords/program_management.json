@@ -5,56 +5,457 @@
   "source_confidence": "E",
   "note": "Compiled from domain knowledge, not yet backed by a live-fetched citation. Phase 9 (app/research/) will upgrade sourcing.",
   "terms": [
-    {"term": "Program manager", "abbreviations": ["PM"], "synonyms": []},
-    {"term": "Project manager", "abbreviations": ["PM"], "synonyms": []},
-    {"term": "Technical program manager", "abbreviations": ["TPM"], "synonyms": []},
-    {"term": "Integrated master schedule", "abbreviations": ["IMS"], "synonyms": []},
-    {"term": "Integrated master plan", "abbreviations": ["IMP"], "synonyms": []},
-    {"term": "Work breakdown structure", "abbreviations": ["WBS"], "synonyms": []},
-    {"term": "Earned value management", "abbreviations": ["EVM"], "synonyms": ["earned value"]},
-    {"term": "Cost performance index", "abbreviations": ["CPI"], "synonyms": []},
-    {"term": "Schedule performance index", "abbreviations": ["SPI"], "synonyms": []},
-    {"term": "Estimate at completion", "abbreviations": ["EAC"], "synonyms": []},
-    {"term": "Estimate to complete", "abbreviations": ["ETC"], "synonyms": []},
-    {"term": "Budget at completion", "abbreviations": ["BAC"], "synonyms": []},
-    {"term": "Critical path method", "abbreviations": ["CPM"], "synonyms": []},
-    {"term": "Critical path", "abbreviations": [], "synonyms": []},
-    {"term": "Schedule float", "abbreviations": [], "synonyms": ["slack"]},
-    {"term": "Risk register", "abbreviations": [], "synonyms": []},
-    {"term": "Risk management plan", "abbreviations": [], "synonyms": []},
-    {"term": "Risk mitigation", "abbreviations": [], "synonyms": []},
-    {"term": "Issue management", "abbreviations": [], "synonyms": []},
-    {"term": "Change control board", "abbreviations": ["CCB"], "synonyms": []},
-    {"term": "Configuration management", "abbreviations": ["CM"], "synonyms": []},
-    {"term": "Baseline management", "abbreviations": [], "synonyms": []},
-    {"term": "Milestone schedule", "abbreviations": [], "synonyms": []},
-    {"term": "Gantt chart", "abbreviations": [], "synonyms": []},
-    {"term": "Primavera P6", "abbreviations": ["P6"], "synonyms": []},
-    {"term": "Microsoft Project", "abbreviations": ["MS Project"], "synonyms": []},
-    {"term": "Resource leveling", "abbreviations": [], "synonyms": []},
-    {"term": "Dependency management", "abbreviations": [], "synonyms": []},
-    {"term": "Recovery plan", "abbreviations": [], "synonyms": ["schedule recovery"]},
-    {"term": "Program review", "abbreviations": [], "synonyms": []},
-    {"term": "Customer interface", "abbreviations": [], "synonyms": ["customer engagement"]},
-    {"term": "Stakeholder management", "abbreviations": [], "synonyms": []},
-    {"term": "Cross-functional leadership", "abbreviations": [], "synonyms": ["cross-functional team leadership"]},
-    {"term": "Executive communication", "abbreviations": [], "synonyms": []},
-    {"term": "Statement of work", "abbreviations": ["SOW"], "synonyms": []},
-    {"term": "Contract deliverables", "abbreviations": [], "synonyms": []},
-    {"term": "Contract line item number", "abbreviations": ["CLIN"], "synonyms": []},
-    {"term": "Firm fixed price", "abbreviations": ["FFP"], "synonyms": []},
-    {"term": "Cost-plus contract", "abbreviations": [], "synonyms": ["cost-plus-fixed-fee", "CPFF"]},
-    {"term": "Indefinite Delivery Indefinite Quantity", "abbreviations": ["IDIQ"], "synonyms": []},
-    {"term": "Program baseline", "abbreviations": [], "synonyms": []},
-    {"term": "Schedule variance", "abbreviations": ["SV"], "synonyms": []},
-    {"term": "Cost variance", "abbreviations": ["CV"], "synonyms": []},
-    {"term": "Program budget", "abbreviations": [], "synonyms": []},
-    {"term": "Multi-year program", "abbreviations": [], "synonyms": []},
-    {"term": "Production program", "abbreviations": [], "synonyms": []},
-    {"term": "Sustainment program", "abbreviations": [], "synonyms": ["sustainment engineering"]},
-    {"term": "Lifecycle management", "abbreviations": [], "synonyms": []},
-    {"term": "Program closeout", "abbreviations": [], "synonyms": []},
-    {"term": "Lessons learned", "abbreviations": [], "synonyms": []},
-    {"term": "Kickoff meeting", "abbreviations": [], "synonyms": ["program kickoff"]}
+    {
+      "term": "Program manager",
+      "abbreviations": [
+        "PM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Project manager",
+      "abbreviations": [
+        "PM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Technical program manager",
+      "abbreviations": [
+        "TPM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Integrated master schedule",
+      "abbreviations": [
+        "IMS"
+      ],
+      "synonyms": [],
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Master Scheduler",
+          "url": "https://builtin.com/job/master-scheduler/10698723",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Blue Origin",
+          "role_title": "Program Manager (S&OP)",
+          "url": "https://builtin.com/job/program-manager/7710841",
+          "date_accessed": "2026-08-15"
+        }
+      ],
+      "source_confidence": "C"
+    },
+    {
+      "term": "Integrated master plan",
+      "abbreviations": [
+        "IMP"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Work breakdown structure",
+      "abbreviations": [
+        "WBS"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Earned value management",
+      "abbreviations": [
+        "EVM"
+      ],
+      "synonyms": [
+        "earned value"
+      ],
+      "sources": [
+        {
+          "company": "Blue Origin",
+          "role_title": "Program Manager (S&OP)",
+          "url": "https://builtin.com/job/program-manager/7710841",
+          "date_accessed": "2026-08-15"
+        }
+      ],
+      "source_confidence": "C"
+    },
+    {
+      "term": "Cost performance index",
+      "abbreviations": [
+        "CPI"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Schedule performance index",
+      "abbreviations": [
+        "SPI"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Estimate at completion",
+      "abbreviations": [
+        "EAC"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Estimate to complete",
+      "abbreviations": [
+        "ETC"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Budget at completion",
+      "abbreviations": [
+        "BAC"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Critical path method",
+      "abbreviations": [
+        "CPM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Critical path",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Schedule float",
+      "abbreviations": [],
+      "synonyms": [
+        "slack"
+      ]
+    },
+    {
+      "term": "Risk register",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Risk management plan",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Risk mitigation",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Issue management",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Change control board",
+      "abbreviations": [
+        "CCB"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Configuration management",
+      "abbreviations": [
+        "CM"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Baseline management",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Milestone schedule",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Gantt chart",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Primavera P6",
+      "abbreviations": [
+        "P6"
+      ],
+      "synonyms": [],
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Master Scheduler",
+          "url": "https://builtin.com/job/master-scheduler/10698723",
+          "date_accessed": "2026-08-15"
+        }
+      ],
+      "source_confidence": "C"
+    },
+    {
+      "term": "Microsoft Project",
+      "abbreviations": [
+        "MS Project"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Resource leveling",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Dependency management",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Recovery plan",
+      "abbreviations": [],
+      "synonyms": [
+        "schedule recovery"
+      ]
+    },
+    {
+      "term": "Program review",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Customer interface",
+      "abbreviations": [],
+      "synonyms": [
+        "customer engagement"
+      ]
+    },
+    {
+      "term": "Stakeholder management",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Cross-functional leadership",
+      "abbreviations": [],
+      "synonyms": [
+        "cross-functional team leadership"
+      ]
+    },
+    {
+      "term": "Executive communication",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Statement of work",
+      "abbreviations": [
+        "SOW"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Contract deliverables",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Contract line item number",
+      "abbreviations": [
+        "CLIN"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Firm fixed price",
+      "abbreviations": [
+        "FFP"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Cost-plus contract",
+      "abbreviations": [],
+      "synonyms": [
+        "cost-plus-fixed-fee",
+        "CPFF"
+      ]
+    },
+    {
+      "term": "Indefinite Delivery Indefinite Quantity",
+      "abbreviations": [
+        "IDIQ"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Program baseline",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Schedule variance",
+      "abbreviations": [
+        "SV"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Cost variance",
+      "abbreviations": [
+        "CV"
+      ],
+      "synonyms": []
+    },
+    {
+      "term": "Program budget",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Multi-year program",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Production program",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Sustainment program",
+      "abbreviations": [],
+      "synonyms": [
+        "sustainment engineering"
+      ]
+    },
+    {
+      "term": "Lifecycle management",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Program closeout",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Lessons learned",
+      "abbreviations": [],
+      "synonyms": []
+    },
+    {
+      "term": "Kickoff meeting",
+      "abbreviations": [],
+      "synonyms": [
+        "program kickoff"
+      ]
+    },
+    {
+      "term": "Project Management Professional certification",
+      "abbreviations": [
+        "PMP"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Blue Origin",
+          "role_title": "Program Manager (S&OP)",
+          "url": "https://builtin.com/job/program-manager/7710841",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Sales and Operations Planning",
+      "abbreviations": [
+        "S&OP",
+        "SIOP"
+      ],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Blue Origin",
+          "role_title": "Program Manager (S&OP)",
+          "url": "https://builtin.com/job/program-manager/7710841",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Program governance",
+      "abbreviations": [],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Hadrian",
+          "role_title": "Technical Program Manager, Capabilities",
+          "url": "https://builtin.com/job/technical-program-manager-faas/8710513",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Milestone-driven schedule",
+      "abbreviations": [],
+      "synonyms": [
+        "logic-linked scheduling"
+      ],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Blue Origin",
+          "role_title": "Program Manager (S&OP)",
+          "url": "https://builtin.com/job/program-manager/7710841",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Agile ceremonies",
+      "abbreviations": [],
+      "synonyms": [
+        "sprint planning",
+        "standups",
+        "retrospectives"
+      ],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Blue Origin",
+          "role_title": "Systems Engineer Integration and Testing",
+          "url": "https://builtin.com/job/systems-engineer-integration-and-testing/10271577",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    },
+    {
+      "term": "Strategic sourcing",
+      "abbreviations": [],
+      "synonyms": [],
+      "source_confidence": "C",
+      "sources": [
+        {
+          "company": "Boeing",
+          "role_title": "Experienced Supplier Program Manager",
+          "url": "https://builtin.com/job/experienced-supplier-program-manager-strategic-sourcing-supplier-development/10699257",
+          "date_accessed": "2026-08-15"
+        },
+        {
+          "company": "Rocket Lab",
+          "role_title": "Senior Global Supply Manager I - PCBA",
+          "url": "https://builtin.com/job/senior-global-supply-manager-i/10557822",
+          "date_accessed": "2026-08-15"
+        }
+      ]
+    }
   ]
 }

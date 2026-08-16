@@ -303,7 +303,14 @@ function renderKeywordCoverage(coverage) {
     .join("");
 
   const matchedChips = coverage.matched
-    .map((m) => `<span class="kw-chip ${m.via === "llm_semantic" ? "llm" : ""}" title="${escapeHtml(m.matched_form)} · ${escapeHtml(m.category_label)}">${escapeHtml(m.term)}</span>`)
+    .map((m) => {
+      const verified = m.confidence === "C" && m.sources && m.sources.length > 0;
+      const cls = `kw-chip ${m.via === "llm_semantic" ? "llm" : ""} ${verified ? "verified" : ""}`;
+      const sourceNote = verified ? ` · verified in a real ${m.sources[0].source.replace("job posting: ", "")}` : "";
+      const title = `${m.matched_form} · ${m.category_label}${sourceNote}`;
+      const badge = verified ? `<span class="kw-chip-badge" title="Confirmed in a real current job posting (Level C)">✓</span>` : "";
+      return `<span class="${cls}" title="${escapeHtml(title)}">${badge}${escapeHtml(m.term)}</span>`;
+    })
     .join("") || `<span class="empty-note">No terms matched.</span>`;
 
   const missingChips = coverage.notable_missing

@@ -61,3 +61,20 @@ def test_no_target_info_falls_back_to_all_categories():
     ctx = build_pdf_context(FIXTURES_DIR / "clean_baseline.pdf")
     _, _, relevant = run_keyword_engine(ctx.full_text, target, _next_id())
     assert len(relevant) == 6  # all category files
+
+
+def test_jd_sweep_terms_carry_level_c_sourcing():
+    """Terms confirmed against the 2026-08-15 real-job-posting sweep
+    (scripts/apply_jd_sweep.py) should report Level C with real sources,
+    not the Level E database default."""
+    text = "Managed AS9100 quality systems and maintained the Integrated Master Schedule (IMS) for the program."
+    target = TargetProfile()
+    coverage, _, _ = run_keyword_engine(text, target, _next_id())
+
+    as9100 = next(m for m in coverage.matched if m.term == "AS9100")
+    assert as9100.confidence == "C"
+    assert len(as9100.sources) >= 1
+    assert as9100.sources[0].url.startswith("http")
+
+    ims = next(m for m in coverage.matched if m.term == "Integrated master schedule")
+    assert ims.confidence == "C"

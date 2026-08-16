@@ -41,10 +41,24 @@ def structural_rule_meta(rule_id: str) -> dict:
 
 
 @dataclass
+class TermSource:
+    company: str
+    role_title: str
+    url: str
+    date_accessed: str
+
+
+@dataclass
 class KeywordTerm:
     term: str
     abbreviations: list[str] = field(default_factory=list)
     synonyms: list[str] = field(default_factory=list)
+    # Per-term override. None means "inherit the category file's
+    # source_confidence" (Level E, internal heuristic). Terms actually
+    # observed in the 2026-08 real-job-posting sweep carry "C" here plus
+    # real sources -- see knowledge_base/job_descriptions/.
+    source_confidence: str | None = None
+    sources: list[TermSource] = field(default_factory=list)
 
     @property
     def all_forms(self) -> list[str]:
@@ -56,6 +70,7 @@ class KeywordCategory:
     key: str
     label: str
     terms: list[KeywordTerm]
+    default_confidence: str = "E"
 
 
 @functools.lru_cache(maxsize=None)
@@ -67,15 +82,20 @@ def keyword_database() -> tuple[KeywordCategory, ...]:
     categories = []
     for rel_path in KEYWORD_CATEGORY_FILES:
         data = load_json(rel_path)
+        default_confidence = data.get("source_confidence", "E")
         terms = [
             KeywordTerm(
                 term=t["term"],
                 abbreviations=t.get("abbreviations", []),
                 synonyms=t.get("synonyms", []),
+                source_confidence=t.get("source_confidence"),
+                sources=[TermSource(**s) for s in t.get("sources", [])],
             )
             for t in data["terms"]
         ]
-        categories.append(KeywordCategory(key=data["category"], label=data["label"], terms=terms))
+        categories.append(
+            KeywordCategory(key=data["category"], label=data["label"], terms=terms, default_confidence=default_confidence)
+        )
     return tuple(categories)
 
 

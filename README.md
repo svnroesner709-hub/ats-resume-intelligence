@@ -17,7 +17,7 @@ Then open http://127.0.0.1:8000 in a browser, drag in a `.pdf` or `.docx` resume
 
 ## Enabling LLM-powered scoring (optional)
 
-Without any setup, the app fully works: Phases 1-5, deterministic Aerospace Keyword Coverage (255+ terms, 457+ matchable forms across 6 domain categories), and a deterministic partial Program Management Positioning score (ownership-vs-weak-participation verb scan) all run for free.
+Without any setup, the app fully works: Phases 1-5, deterministic Aerospace Keyword Coverage (290+ terms across 6 domain categories, 48 of them verified against real 2026-08-15 job postings from Anduril/Rocket Lab/Impulse Space/SpaceX/Blue Origin/Boeing/Hadrian -- see "Keyword database sourcing" below), and a deterministic partial Program Management Positioning score (ownership-vs-weak-participation verb scan) all run for free.
 
 To additionally enable **Target Role Alignment, the LLM-scored half of Program Management Positioning, Recruiter Readability, Executive/Seniority Signal, Overall Resume Strength, and the JD Requirement Coverage Matrix**:
 
@@ -52,7 +52,9 @@ Every computed score carries a `checks: [{name, passed, detail, source}]` list, 
 
 ## Source confidence
 
-Every finding and score check carries a `confidence` level (A-E, see `app/models.py::SourceConfidence`). **Everything in this build is currently Level E** -- deterministic rules and the keyword database are "internal heuristic, not yet backed by a fetched citation"; LLM-derived findings are labeled `LLM judgment (model: ...)`, explicitly distinct from a deterministic rule. Level A/B/C claims require `app/research/` (Phase 9, still a stub) to actually fetch and record a real source with a URL and access date.
+Every finding and score check carries a `confidence` level (A-E, see `app/models.py::SourceConfidence`). Most of the build is Level E ("internal heuristic, not yet backed by a fetched citation") -- deterministic rules default to this; LLM-derived findings are labeled `LLM judgment (model: ...)`, explicitly distinct from a deterministic rule. `app/research/` (live ATS-behavior citations) is still a stub, so no finding claims Level A/B.
+
+**Exception: 48 keyword-database terms are Level C** ("large aggregated corpus of current job postings"), from a real 2026-08-15 research sweep of Anduril, Rocket Lab, Impulse Space, SpaceX, Blue Origin, Boeing, and Hadrian postings -- see `app/knowledge_base/job_descriptions/README.md` for full methodology and honest yield, and `scripts/apply_jd_sweep.py` for the reviewable diff it applied. Matched keywords backed this way show a ✓ badge in the GUI's Keywords tab with the real source (company, role, URL) in the tooltip; everything else in the keyword database stays Level E until a term is independently confirmed the same way.
 
 ## Architecture
 
@@ -70,14 +72,18 @@ app/
   llm/                  Anthropic API wrapper (client.py) + tool-call schemas (schemas.py)
   config.py             .env loading, LLM_ENABLED / LLM_MODEL
   research/             Stub -- Phase 9
-  knowledge_base/       JSON-backed rule/term seed data, incl. keywords/ (255+ term database)
+  knowledge_base/       JSON-backed rule/term seed data
+    keywords/            290+ term database, 48 Level C (see job_descriptions/)
+    job_descriptions/    Real 2026-08-15 JD research sweep: structured records + methodology README
   scoring/              Builds every score's checklist from data already computed elsewhere
   annotation/           Phase 4: Finding -> overlay geometry
   exports/              JSON report (implemented) + stubs for everything else
   models.py             Pydantic schema shared by backend + GUI
   main.py               FastAPI app -- orchestrates all engines, degrades LLM failures per-score
-static/                 Vanilla HTML/CSS/JS GUI (no build step, no CDN dependency)
+static/                 Vanilla HTML/CSS/JS GUI (no build step, no CDN dependency), dark mode via
+                        CSS custom properties + prefers-color-scheme + manual toggle
 tests/                  pytest suite: deterministic tests + LLM tests via monkeypatched call_tool
+scripts/                One-off maintenance scripts (e.g. apply_jd_sweep.py)
 data/uploads/           gitignored -- runtime-only, never committed
 .env.example            Copy to .env and add your own ANTHROPIC_API_KEY (never commit .env)
 ```

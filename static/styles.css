@@ -261,6 +261,8 @@ button.secondary {
 .kw-chip { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 .kw-chip.llm { background: var(--info-bg); color: var(--info); }
 .kw-chip.missing { background: var(--chip-missing-bg); color: var(--text-dim); font-weight: 500; }
+.kw-chip.verified { background: var(--yellow-bg); color: var(--yellow); }
+.kw-chip-badge { margin-right: 3px; }
 
 .jd-row { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 12px; border-left-width: 4px; }
 .jd-strong_match { border-left-color: var(--pass); }
