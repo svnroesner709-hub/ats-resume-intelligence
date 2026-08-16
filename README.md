@@ -17,9 +17,9 @@ Then open http://127.0.0.1:8000 in a browser, drag in a `.pdf` or `.docx` resume
 
 ## Enabling LLM-powered scoring (optional)
 
-Without any setup, the app fully works: Phases 1-5, deterministic Aerospace Keyword Coverage (290+ terms across 6 domain categories, 48 of them verified against real 2026-08-15 job postings from Anduril/Rocket Lab/Impulse Space/SpaceX/Blue Origin/Boeing/Hadrian -- see "Keyword database sourcing" below), and a deterministic partial Program Management Positioning score (ownership-vs-weak-participation verb scan) all run for free.
+Without any setup, the app fully works and five of the seven sub-scores are real, computed numbers -- **ATS Parsing Reliability, ATS Structural Compatibility, Aerospace Keyword Coverage** (290+ terms across 6 domain categories, 48 of them verified against real 2026-08-15 job postings -- see "Keyword database sourcing" below), **Program Management Positioning** (ownership-vs-weak-participation verb scan), **Recruiter Readability** (Bullshit/Redundancy detectors), and **Target Role Alignment** (role-taxonomy terminology fit -- type a target role like "Technical Program Manager" into the Target Role field and it scores immediately, no job description or API key required).
 
-To additionally enable **Target Role Alignment, the LLM-scored half of Program Management Positioning, Recruiter Readability, Executive/Seniority Signal, Overall Resume Strength, and the JD Requirement Coverage Matrix**:
+Only **Executive/Seniority Signal** and the **JD Requirement Coverage Matrix** are fully gated behind an API key -- they need the kind of narrative judgment a deterministic rule can't approximate. To enable those, plus qualitative LLM depth layered on top of the five free scores above:
 
 1. `copy .env.example .env`
 2. Add your own `ANTHROPIC_API_KEY` to `.env` (never commit this file -- it's gitignored).
@@ -36,9 +36,11 @@ Each analysis with a key configured makes a small number of real Anthropic API c
 | 3 | Document viewer | ✅ Implemented (server-rendered PDF page PNGs; mammoth HTML for DOCX) |
 | 4 | Highlight/annotation engine | ✅ Implemented for findings with known page geometry (not every finding has a natural bounding box -- see below) |
 | 5 | ATS structural rule engine | ✅ Implemented: columns, tables, text boxes (DOCX), hidden/white text (DOCX), header/footer-only contact info, uncommon fonts, missing section headings, contact-field completeness |
-| 6 | Career narrative / seniority / summary / readability | ✅ Implemented, **LLM-powered** -- requires `ANTHROPIC_API_KEY` (`app/career_engine/`) |
+| 5 | Target Role Alignment | ✅ Implemented -- deterministic role-taxonomy terminology fit against a free-text Target Role (17 role profiles) always runs free, no JD or API key needed; LLM adds qualitative narrative judgment on top when configured (`app/career_engine/role_alignment.py`) |
+| 6 | Career narrative / seniority / summary | ✅ Implemented, **LLM-powered** -- requires `ANTHROPIC_API_KEY` (`app/career_engine/engine.py`) |
+| 6/12 | Recruiter Readability | ✅ Implemented -- deterministic Bullshit/Redundancy detectors always run free; LLM adds holistic narrative-clarity judgment on top when configured (`app/career_engine/readability_scan.py`) |
 | 7 | PM Positioning (ownership language + bullet strength) | ✅ Implemented -- deterministic ownership-verb scan always runs free; LLM adds per-bullet Action/Scope/Context/Result depth when configured (`app/aerospace_engine/`) |
-| 8 | Keyword/semantic matching | ✅ Implemented -- deterministic database (255+ terms) always runs free; optional LLM semantic-enrichment pass for near-misses (`app/keyword_engine/`) |
+| 8 | Keyword/semantic matching | ✅ Implemented -- deterministic database (290+ terms) always runs free; optional LLM semantic-enrichment pass for near-misses (`app/keyword_engine/`) |
 | 8 | JD Requirement Coverage Matrix | ✅ Implemented, **LLM-powered** -- only runs when a job description is pasted and a key is configured (`app/jd_matching/`) |
 | 9 | External research / live-sourced ATS citations | 🚧 Scaffolded, not implemented (`app/research/`) -- all current knowledge-base citations are honestly labeled Level E (internal heuristic, including the keyword database and LLM outputs) |
 | 10 | Exports & version comparison | Partial: JSON analysis report ✅. Annotated PDF, rewrite, ATS-safe/human-optimized/target-job-specific versions, and version comparison are 🚧 stubs (`app/exports/stubs.py`) |
@@ -48,7 +50,8 @@ Each analysis with a key configured makes a small number of real Anthropic API c
 Every computed score carries a `checks: [{name, passed, detail, source}]` list, shown in the GUI as an expandable checklist under each score row. Two different meanings, both labeled as such in each score's `explanation`:
 
 - **Parsing Reliability, Structural Compatibility, Keyword Coverage**: the score number *is* the percentage of named checks that passed -- the checklist fully explains the number, not just illustrates it.
-- **The four LLM-backed scores**: the number is the model's own holistic 0-100 rating; the checklist shows corroborating verdicts alongside it (e.g. "seniority calibration verdict"), not a formula that produced the number.
+- **PM Positioning, Recruiter Readability, Target Role Alignment**: a deterministic component (ownership-verb ratio, filler/redundancy scan, or role-taxonomy fit, respectively) always contributes a real number; the LLM's holistic judgment is averaged in on top when configured. The checklist shows both halves' verdicts.
+- **Executive/Seniority Signal**: purely the LLM's holistic 0-100 rating (no deterministic proxy exists for this one yet); the checklist shows corroborating verdicts alongside it (e.g. "seniority calibration verdict"), not a formula that produced the number.
 
 ## Source confidence
 
@@ -65,7 +68,9 @@ app/
   document_rendering/   Phase 3: PDF page->PNG, DOCX->HTML (mammoth)
   ats_engine/           Phase 5: the deterministic structural rule engine
   formatting_engine/    Mostly stub -- see module docstring
-  career_engine/        Phase 6, LLM-powered (app/career_engine/engine.py)
+  career_engine/        engine.py (Phase 6, LLM-powered) + role_alignment.py (Target Role
+                        Alignment, deterministic) + readability_scan.py (Recruiter
+                        Readability's Bullshit/Redundancy detectors, deterministic)
   aerospace_engine/     Phase 7: ownership_scan.py (deterministic) + engine.py (LLM bullet quality)
   keyword_engine/       Phase 8 core: matcher.py (deterministic + optional LLM enrichment)
   jd_matching/          Phase 8 JD mode, LLM-powered (engine.py)
@@ -74,6 +79,7 @@ app/
   research/             Stub -- Phase 9
   knowledge_base/       JSON-backed rule/term seed data
     keywords/            290+ term database, 48 Level C (see job_descriptions/)
+    role_taxonomy/       17 role profiles (expected categories + signature terms) for role_alignment.py
     job_descriptions/    Real 2026-08-15 JD research sweep: structured records + methodology README
   scoring/              Builds every score's checklist from data already computed elsewhere
   annotation/           Phase 4: Finding -> overlay geometry
@@ -103,4 +109,4 @@ data/uploads/           gitignored -- runtime-only, never committed
 venv\Scripts\python -m pytest -v
 ```
 
-31 tests, all free (no network calls, no API key needed). Fixtures are generated (not hand-written) by `tests/fixtures/generate_fixtures.py` -- every name/email/employer in them is fictional. `tests/test_llm_modules.py` verifies the LLM-backed modules' plumbing (Finding construction, graceful degradation) by monkeypatching `app.llm.client.call_tool` with canned responses -- it never makes a real API call.
+44 tests, all free (no network calls, no API key needed). Fixtures are generated (not hand-written) by `tests/fixtures/generate_fixtures.py` -- every name/email/employer in them is fictional. `tests/test_llm_modules.py` verifies the LLM-backed modules' plumbing (Finding construction, graceful degradation) by monkeypatching `app.llm.client.call_tool` with canned responses -- it never makes a real API call.

@@ -1,0 +1,126 @@
+{
+  "description": "Role taxonomy for deterministic Target Role Alignment: maps a free-text target role (e.g. 'Technical Program Manager') to an expected terminology profile -- a weighted mix of app/knowledge_base/keywords/ categories plus a short list of signature terms particularly characteristic of that role. Used by app/career_engine/role_alignment.py to score how much a resume's actual matched-keyword profile looks like a typical resume for the target role, and to surface specific missing signature terms as tailoring suggestions -- independent of whether the resume's current/implied role matches the target (the whole point is to help tailor toward a different target role).",
+  "source_confidence": "E",
+  "note": "Compiled from domain knowledge (spec's Layer 5 role list plus this project's domain coverage), not yet backed by a live-fetched citation.",
+  "roles": [
+    {
+      "key": "project_manager",
+      "label": "Project Manager",
+      "aliases": ["project manager", "pm"],
+      "category_weights": {"program_management": 0.7, "government_contracting": 0.15, "manufacturing_quality": 0.1, "systems_engineering_certification": 0.05},
+      "signature_terms": ["Project manager", "Work breakdown structure", "Risk register", "Schedule variance", "Stakeholder management", "Program review", "Critical path"]
+    },
+    {
+      "key": "program_manager",
+      "label": "Program Manager",
+      "aliases": ["program manager"],
+      "category_weights": {"program_management": 0.65, "government_contracting": 0.2, "manufacturing_quality": 0.1, "systems_engineering_certification": 0.05},
+      "signature_terms": ["Program manager", "Integrated master schedule", "Earned value management", "Risk management plan", "Program budget", "Statement of work", "Cross-functional leadership"]
+    },
+    {
+      "key": "technical_program_manager",
+      "label": "Technical Program Manager",
+      "aliases": ["technical program manager", "tpm", "tech program manager", "technical pm"],
+      "category_weights": {"program_management": 0.4, "systems_engineering_certification": 0.35, "tools_systems": 0.15, "aerospace_defense": 0.1},
+      "signature_terms": ["Technical program manager", "Systems engineering", "Requirements management", "Integrated master schedule", "Cross-functional leadership", "Interface control document", "Risk management plan"]
+    },
+    {
+      "key": "engineering_program_manager",
+      "label": "Engineering Program Manager",
+      "aliases": ["engineering program manager", "epm"],
+      "category_weights": {"program_management": 0.45, "systems_engineering_certification": 0.3, "manufacturing_quality": 0.15, "aerospace_defense": 0.1},
+      "signature_terms": ["Program manager", "Systems engineering", "Preliminary design review", "Critical design review", "Integrated master schedule", "Configuration management"]
+    },
+    {
+      "key": "manufacturing_program_manager",
+      "label": "Manufacturing Program Manager",
+      "aliases": ["manufacturing program manager"],
+      "category_weights": {"program_management": 0.35, "manufacturing_quality": 0.45, "aerospace_defense": 0.1, "systems_engineering_certification": 0.1},
+      "signature_terms": ["Program manager", "New product introduction", "Manufacturing readiness level", "Production readiness review", "Production ramp", "AS9100", "Design for Manufacturability and Assembly"]
+    },
+    {
+      "key": "product_program_manager",
+      "label": "Product Program Manager",
+      "aliases": ["product program manager", "product manager"],
+      "category_weights": {"program_management": 0.55, "manufacturing_quality": 0.25, "tools_systems": 0.1, "systems_engineering_certification": 0.1},
+      "signature_terms": ["Program manager", "New product introduction", "Program budget", "Stakeholder management", "Executive communication"]
+    },
+    {
+      "key": "operations_program_manager",
+      "label": "Operations Program Manager",
+      "aliases": ["operations program manager", "operations manager"],
+      "category_weights": {"program_management": 0.4, "manufacturing_quality": 0.35, "government_contracting": 0.15, "tools_systems": 0.1},
+      "signature_terms": ["Program manager", "Throughput", "Capacity utilization", "Production ramp", "Supplier quality", "Program budget"]
+    },
+    {
+      "key": "systems_engineer",
+      "label": "Systems Engineer",
+      "aliases": ["systems engineer", "systems engineering"],
+      "category_weights": {"systems_engineering_certification": 0.6, "aerospace_defense": 0.2, "program_management": 0.1, "tools_systems": 0.1},
+      "signature_terms": ["Systems engineering", "Requirements management", "Verification and validation", "Preliminary design review", "Critical design review", "Interface control document", "Model-based systems engineering"]
+    },
+    {
+      "key": "materials_and_processes_engineer",
+      "label": "Materials & Processes Engineer",
+      "aliases": ["materials and processes engineer", "materials & processes engineer", "m&p engineer", "materials and processes", "materials & processes"],
+      "category_weights": {"aerospace_defense": 0.45, "manufacturing_quality": 0.35, "systems_engineering_certification": 0.1, "tools_systems": 0.1},
+      "signature_terms": ["Materials and Processes", "Composite structures", "Titanium forgings", "Aerospace-grade aluminum", "Specialty alloys", "Non-destructive testing"]
+    },
+    {
+      "key": "manufacturing_engineer",
+      "label": "Manufacturing Engineer",
+      "aliases": ["manufacturing engineer", "manufacturing engineering"],
+      "category_weights": {"manufacturing_quality": 0.55, "aerospace_defense": 0.2, "tools_systems": 0.15, "systems_engineering_certification": 0.1},
+      "signature_terms": ["New product introduction", "Manufacturing readiness level", "Design for Manufacturability and Assembly", "Production Part Approval Process", "Bill of materials", "Geometric Dimensioning and Tolerancing"]
+    },
+    {
+      "key": "quality_engineer",
+      "label": "Quality Engineer",
+      "aliases": ["quality engineer", "quality engineering", "supplier quality engineer"],
+      "category_weights": {"manufacturing_quality": 0.65, "systems_engineering_certification": 0.15, "aerospace_defense": 0.1, "government_contracting": 0.1},
+      "signature_terms": ["AS9100", "Root cause corrective action", "Failure modes and effects analysis", "Material Review Board", "Nonconformance report", "Supplier quality", "First article inspection"]
+    },
+    {
+      "key": "supply_chain_manager",
+      "label": "Supply Chain Manager",
+      "aliases": ["supply chain manager", "supply chain program manager", "procurement manager", "supply chain"],
+      "category_weights": {"manufacturing_quality": 0.35, "government_contracting": 0.3, "program_management": 0.25, "tools_systems": 0.1},
+      "signature_terms": ["Dual sourcing", "Vendor qualification", "Long lead item", "Should-cost analysis", "Strategic sourcing", "Request for proposal"]
+    },
+    {
+      "key": "avionics_electrical_engineer",
+      "label": "Avionics / Electrical Engineer",
+      "aliases": ["avionics engineer", "electrical engineer", "avionics", "electrical engineering"],
+      "category_weights": {"aerospace_defense": 0.55, "systems_engineering_certification": 0.25, "tools_systems": 0.15, "manufacturing_quality": 0.05},
+      "signature_terms": ["Avionics", "Electrical power system", "Flight management system", "Hardware-in-the-loop testing", "Inertial navigation system"]
+    },
+    {
+      "key": "software_engineer",
+      "label": "Software Engineer",
+      "aliases": ["software engineer", "software engineering"],
+      "category_weights": {"tools_systems": 0.4, "systems_engineering_certification": 0.3, "aerospace_defense": 0.2, "program_management": 0.1},
+      "signature_terms": ["Software-in-the-loop testing", "DO-178C", "Agile", "Jira", "Model-based systems engineering"]
+    },
+    {
+      "key": "test_engineer",
+      "label": "Test Engineer",
+      "aliases": ["test engineer", "integration and test engineer", "test and integration engineer"],
+      "category_weights": {"systems_engineering_certification": 0.45, "aerospace_defense": 0.3, "manufacturing_quality": 0.15, "tools_systems": 0.1},
+      "signature_terms": ["Test readiness review", "Qualification testing", "Acceptance testing", "Environmental testing", "Vibration testing", "Hardware-in-the-loop testing", "LabVIEW"]
+    },
+    {
+      "key": "gnc_engineer",
+      "label": "GNC Engineer",
+      "aliases": ["gnc engineer", "guidance navigation and control engineer", "guidance and control engineer"],
+      "category_weights": {"aerospace_defense": 0.6, "systems_engineering_certification": 0.25, "tools_systems": 0.15},
+      "signature_terms": ["Guidance Navigation and Control", "Thrust vector control", "Reaction control system", "Slosh modeling", "Inertial navigation system"]
+    },
+    {
+      "key": "aerospace_generalist",
+      "label": "Aerospace Generalist",
+      "aliases": ["aerospace engineer", "aerospace generalist"],
+      "category_weights": {"aerospace_defense": 0.4, "systems_engineering_certification": 0.25, "program_management": 0.2, "manufacturing_quality": 0.15},
+      "signature_terms": ["Airworthiness", "Flight test campaign", "Systems engineering", "Program manager"]
+    }
+  ]
+}

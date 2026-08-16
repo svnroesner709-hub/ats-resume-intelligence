@@ -283,9 +283,134 @@ def compute_pm_positioning(pm_data: dict) -> ScoreValue:
 
 
 # ---------------------------------------------------------------------------
-# LLM-only scores: Target Role Alignment, Recruiter Readability,
-# Executive/Seniority Signal (all sourced from one positioning_result dict)
+# Target Role Alignment (deterministic role-taxonomy fit, +LLM narrative)
 # ---------------------------------------------------------------------------
+
+def compute_target_role_alignment(
+    role_alignment_data: dict | None, positioning_result: dict | None, positioning_error: str | None, model: str
+) -> ScoreValue:
+    checks: list[ScoreCheck] = []
+    det_score = None
+    llm_score = None
+
+    if role_alignment_data:
+        det_score = role_alignment_data["score"]
+        checks.append(
+            ScoreCheck(
+                name=f"Signature terms for '{role_alignment_data['matched_role_label']}' present",
+                passed=role_alignment_data["signature_ratio"] >= 0.5,
+                detail=(
+                    f"{len(role_alignment_data['signature_hits'])}/"
+                    f"{len(role_alignment_data['signature_hits']) + len(role_alignment_data['signature_missing'])} "
+                    f"signature terms matched."
+                ),
+                source=_cite("role_taxonomy_alignment", f"Terms characteristic of a {role_alignment_data['matched_role_label']} resume."),
+            )
+        )
+        checks.append(
+            ScoreCheck(
+                name=f"Domain-category mix fits '{role_alignment_data['matched_role_label']}'",
+                passed=role_alignment_data["category_fit"] >= 0.15,
+                detail=f"Weighted category coverage fit: {role_alignment_data['category_fit'] * 100:.0f}%.",
+                source=_cite("role_taxonomy_alignment", "Weighted mix of keyword-database categories expected for this role."),
+            )
+        )
+
+    if positioning_result:
+        llm_score = positioning_result.get("role_alignment_score", 0)
+        checks.append(
+            ScoreCheck(
+                name="Implied role matches target (LLM judgment)",
+                passed=llm_score >= 70,
+                detail=f"Implied role: {positioning_result.get('implied_role', 'unclear')}.",
+                source=_llm_cite(model, "Implied-role classification vs. target."),
+            )
+        )
+
+    if det_score is None and llm_score is None:
+        status = "llm_error" if positioning_error else "not yet implemented"
+        explanation = positioning_error or (
+            "Enter a Target Role (e.g. 'Technical Program Manager') for deterministic role-fit scoring -- free, no "
+            "API key needed -- and/or set ANTHROPIC_API_KEY for qualitative narrative judgment too."
+        )
+        return ScoreValue(value=None, label="Target Role Alignment", status=status, explanation=explanation)
+
+    if det_score is not None and llm_score is not None:
+        score = _clamp((det_score + llm_score) / 2)
+        explanation = (
+            f"Average of deterministic terminology fit against the '{role_alignment_data['matched_role_label']}' "
+            f"profile and the LLM's qualitative role-alignment judgment."
+        )
+    elif det_score is not None:
+        score = det_score
+        explanation = (
+            f"Deterministic terminology fit against the '{role_alignment_data['matched_role_label']}' profile only "
+            f"(set ANTHROPIC_API_KEY for qualitative narrative judgment too)."
+        )
+    else:
+        score = _clamp(llm_score)
+        explanation = positioning_result.get("role_alignment_rationale", "")
+
+    return ScoreValue(value=score, label="Target Role Alignment", status="computed", explanation=explanation, checks=checks)
+
+
+# ---------------------------------------------------------------------------
+# Recruiter Readability (deterministic bullshit/redundancy detectors, +LLM)
+# ---------------------------------------------------------------------------
+
+def compute_recruiter_readability(
+    readability_data: dict, positioning_result: dict | None, positioning_error: str | None, model: str
+) -> ScoreValue:
+    buzzword_hits = readability_data["buzzword_hits"]
+    redundant_verbs = readability_data["redundant_verbs"]
+
+    penalty = min(50, len(buzzword_hits) * 10) + min(30, len(redundant_verbs) * 15)
+    det_score = _clamp(100 - penalty)
+
+    checks = [
+        ScoreCheck(
+            name="No generic corporate filler phrases without supporting evidence",
+            passed=len(buzzword_hits) == 0,
+            detail=(
+                "None found." if not buzzword_hits
+                else f"{len(buzzword_hits)} found, e.g. \"{buzzword_hits[0]['phrase']}\"."
+            ),
+            source=_cite("bullshit_detector", "Generic corporate phrasing without concrete evidence reads as filler, not a substantive claim."),
+        ),
+        ScoreCheck(
+            name="No single verb overused across bullets",
+            passed=len(redundant_verbs) == 0,
+            detail=(
+                "Good verb variety." if not redundant_verbs
+                else f"'{redundant_verbs[0]['verb']}' used {redundant_verbs[0]['count']} times."
+            ),
+            source=_cite("redundancy_detector", "A single generic verb repeated many times reads as low-effort and obscures which accomplishments actually differ."),
+        ),
+    ]
+
+    llm_score = None
+    if positioning_result:
+        llm_score = positioning_result.get("recruiter_readability_score", 0)
+        checks.append(
+            ScoreCheck(
+                name="Narrative answers 'what does this person do?' in one clear read (LLM judgment)",
+                passed=bool(positioning_result.get("narrative_sentence")),
+                detail=positioning_result.get("narrative_sentence", ""),
+                source=_llm_cite(model, "One-sentence narrative extraction."),
+            )
+        )
+
+    if llm_score is not None:
+        score = _clamp((det_score + llm_score) / 2)
+        explanation = "Average of deterministic filler/redundancy scanning and the LLM's holistic readability judgment."
+    else:
+        score = det_score
+        explanation = "Deterministic filler/redundancy scanning only (set ANTHROPIC_API_KEY for holistic narrative-clarity judgment too)."
+        if positioning_error:
+            explanation += f" LLM pass attempted but failed: {positioning_error}"
+
+    return ScoreValue(value=score, label="Recruiter Readability", status="computed", explanation=explanation, checks=checks)
+
 
 def _llm_gated_score(label: str, positioning_result: dict | None, positioning_error: str | None,
                       value_key: str, rationale_key: str, extra_checks: list[ScoreCheck]) -> ScoreValue:
@@ -299,30 +424,6 @@ def _llm_gated_score(label: str, positioning_result: dict | None, positioning_er
         explanation=positioning_result.get(rationale_key, ""),
         checks=extra_checks,
     )
-
-
-def compute_target_role_alignment(positioning_result: dict | None, positioning_error: str | None, model: str) -> ScoreValue:
-    checks = []
-    if positioning_result:
-        checks.append(ScoreCheck(
-            name="Implied role matches target",
-            passed=positioning_result.get("role_alignment_score", 0) >= 70,
-            detail=f"Implied role: {positioning_result.get('implied_role', 'unclear')}.",
-            source=_llm_cite(model, "Implied-role classification vs. target."),
-        ))
-    return _llm_gated_score("Target Role Alignment", positioning_result, positioning_error, "role_alignment_score", "role_alignment_rationale", checks)
-
-
-def compute_recruiter_readability(positioning_result: dict | None, positioning_error: str | None, model: str) -> ScoreValue:
-    checks = []
-    if positioning_result:
-        checks.append(ScoreCheck(
-            name="Narrative answers 'what does this person do?' in one clear read",
-            passed=bool(positioning_result.get("narrative_sentence")),
-            detail=positioning_result.get("narrative_sentence", ""),
-            source=_llm_cite(model, "One-sentence narrative extraction."),
-        ))
-    return _llm_gated_score("Recruiter Readability", positioning_result, positioning_error, "recruiter_readability_score", "recruiter_readability_rationale", checks)
 
 
 def compute_seniority_signal(positioning_result: dict | None, positioning_error: str | None, model: str) -> ScoreValue:
@@ -361,6 +462,8 @@ def compute_scores(
     keyword_coverage: KeywordCoverageResult,
     relevant_keyword_categories: set[str],
     pm_positioning_data: dict,
+    role_alignment_data: dict | None,
+    readability_data: dict,
     positioning_result: dict | None,
     positioning_error: str | None,
     llm_model: str,
@@ -369,8 +472,8 @@ def compute_scores(
     structural = compute_structural_compatibility(findings, contact)
     keyword = compute_keyword_coverage(keyword_coverage, relevant_keyword_categories)
     pm_positioning = compute_pm_positioning(pm_positioning_data)
-    role_alignment = compute_target_role_alignment(positioning_result, positioning_error, llm_model)
-    readability = compute_recruiter_readability(positioning_result, positioning_error, llm_model)
+    role_alignment = compute_target_role_alignment(role_alignment_data, positioning_result, positioning_error, llm_model)
+    readability = compute_recruiter_readability(readability_data, positioning_result, positioning_error, llm_model)
     seniority = compute_seniority_signal(positioning_result, positioning_error, llm_model)
 
     partial = {

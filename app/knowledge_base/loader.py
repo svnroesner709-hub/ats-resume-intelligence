@@ -107,3 +107,31 @@ def ownership_verbs() -> list[str]:
 def weak_participation_verbs() -> list[str]:
     data = load_json("keywords/ownership_verbs.json")
     return data["weak_participation_verbs"]
+
+
+@dataclass
+class RoleProfile:
+    key: str
+    label: str
+    aliases: list[str]
+    category_weights: dict[str, float]
+    signature_terms: list[str]
+
+
+@functools.lru_cache(maxsize=None)
+def role_taxonomy() -> tuple[RoleProfile, ...]:
+    """The role taxonomy used by app/career_engine/role_alignment.py for
+    deterministic Target Role Alignment. See
+    app/knowledge_base/role_taxonomy/roles.json for the data and its
+    module-level docstring for the matching approach."""
+    data = load_json("role_taxonomy/roles.json")
+    return tuple(
+        RoleProfile(
+            key=r["key"],
+            label=r["label"],
+            aliases=r["aliases"],
+            category_weights=r["category_weights"],
+            signature_terms=r["signature_terms"],
+        )
+        for r in data["roles"]
+    )

@@ -78,7 +78,6 @@ analyzeBtn.addEventListener("click", async () => {
   form.append("industry", $("#industry").value);
   form.append("career_path", $("#career_path").value);
   form.append("target_role", $("#target_role").value);
-  form.append("seniority", $("#seniority").value);
   form.append("target_company", $("#target_company").value);
   form.append("background_notes", $("#background_notes").value);
   form.append("job_description", $("#job_description").value);

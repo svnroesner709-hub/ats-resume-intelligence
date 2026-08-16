@@ -22,6 +22,8 @@ from app.annotation.mapper import build_overlays
 from app.aerospace_engine.engine import run_pm_positioning
 from app.ats_engine.engine import build_docx_context, build_pdf_context, run_rules
 from app.career_engine.engine import evaluate_positioning
+from app.career_engine.readability_scan import run_readability_scan
+from app.career_engine.role_alignment import compute_role_alignment
 from app.config import LLM_ENABLED, LLM_MODEL
 from app.document_rendering import docx_renderer, pdf_renderer
 from app.exports import json_export, stubs as export_stubs
@@ -160,8 +162,22 @@ async def analyze(
     pm_positioning_data, pm_findings = run_pm_positioning(ctx.full_text, target, next_id)
     findings += pm_findings
 
-    # Phase 6: career narrative / seniority / summary / readability --
+    # Recruiter Readability, deterministic half: bullshit/redundancy
+    # detectors always run (free) -- never gated on an API key.
+    readability_data, readability_findings = run_readability_scan(ctx.full_text, next_id)
+    findings += readability_findings
+
+    # Target Role Alignment, deterministic half: role-taxonomy terminology
+    # fit against the free-text Target Role field, if it matches a known
+    # role -- always free, no API key needed. None if no target role was
+    # entered or it didn't match any known role profile.
+    role_alignment_data, role_alignment_findings = compute_role_alignment(keyword_coverage, target.target_role, next_id)
+    findings += role_alignment_findings
+
+    # Phase 6: career narrative / seniority / summary --
     # fully LLM-gated, degrades cleanly to "not configured" or "llm_error".
+    # Also adds qualitative depth on top of Target Role Alignment and
+    # Recruiter Readability's deterministic halves above when configured.
     positioning_result: Optional[dict] = None
     positioning_error: Optional[str] = None
     if LLM_ENABLED:
@@ -191,6 +207,8 @@ async def analyze(
         keyword_coverage=keyword_coverage,
         relevant_keyword_categories=relevant_keyword_categories,
         pm_positioning_data=pm_positioning_data,
+        role_alignment_data=role_alignment_data,
+        readability_data=readability_data,
         positioning_result=positioning_result,
         positioning_error=positioning_error,
         llm_model=LLM_MODEL,

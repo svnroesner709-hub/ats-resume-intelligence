@@ -2,6 +2,8 @@ from tests.fixtures.generate_fixtures import FIXTURES_DIR
 
 from app.aerospace_engine.engine import run_pm_positioning
 from app.ats_engine.engine import build_pdf_context, run_rules
+from app.career_engine.readability_scan import run_readability_scan
+from app.career_engine.role_alignment import compute_role_alignment
 from app.keyword_engine.matcher import run_keyword_engine
 from app.models import TargetProfile
 from app.scoring.engine import compute_scores
@@ -25,10 +27,15 @@ def _run_pipeline(fixture_name: str, target: TargetProfile):
     findings += kw_findings
     pm_data, pm_findings = run_pm_positioning(ctx.full_text, target, next_id)
     findings += pm_findings
+    readability_data, readability_findings = run_readability_scan(ctx.full_text, next_id)
+    findings += readability_findings
+    role_alignment_data, role_alignment_findings = compute_role_alignment(coverage, target.target_role, next_id)
+    findings += role_alignment_findings
     scores = compute_scores(
         findings=findings, comparison=ctx.extraction_comparison, contact=contact,
         keyword_coverage=coverage, relevant_keyword_categories=relevant,
-        pm_positioning_data=pm_data, positioning_result=None, positioning_error=None,
+        pm_positioning_data=pm_data, role_alignment_data=role_alignment_data, readability_data=readability_data,
+        positioning_result=None, positioning_error=None,
         llm_model="claude-sonnet-5",
     )
     return scores
