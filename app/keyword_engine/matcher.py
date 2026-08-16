@@ -112,11 +112,29 @@ def _dictionary_match(full_text: str, categories: tuple[KeywordCategory, ...]) -
     return matched, unmatched_by_category
 
 
+def _round_robin_candidates(unmatched_by_category: dict[str, list[str]], relevant_keys: set[str], cap: int) -> list[str]:
+    """Interleaves terms across relevant categories (sorted for determinism)
+    rather than exhausting one category before the next. Plain concatenation
+    let one large category (e.g. 50+ unmatched Program Management terms)
+    crowd out every other relevant category before the cap was reached --
+    and because relevant_keys is a set, the crowding-out category depended
+    on Python's per-process hash seed, making the enrichment candidate list
+    silently non-deterministic across runs (caught by CI-style flakiness)."""
+    per_category = [unmatched_by_category.get(key, []) for key in sorted(relevant_keys)]
+    candidates: list[str] = []
+    row = 0
+    while len(candidates) < cap and any(row < len(lst) for lst in per_category):
+        for lst in per_category:
+            if row < len(lst):
+                candidates.append(lst[row])
+                if len(candidates) >= cap:
+                    break
+        row += 1
+    return candidates
+
+
 def _try_llm_enrichment(full_text: str, unmatched_by_category: dict[str, list[str]], relevant_keys: set[str]) -> list[MatchedKeyword]:
-    candidates = []
-    for key in relevant_keys:
-        candidates.extend(unmatched_by_category.get(key, []))
-    candidates = candidates[:_MAX_ENRICHMENT_CANDIDATES]
+    candidates = _round_robin_candidates(unmatched_by_category, relevant_keys, _MAX_ENRICHMENT_CANDIDATES)
     if not candidates:
         return []
 

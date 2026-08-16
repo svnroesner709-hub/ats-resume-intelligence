@@ -5,15 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATS Resume Intelligence</title>
 <link rel="stylesheet" href="/static/styles.css">
+<script>
+  // Applied before first paint to avoid a flash of the wrong theme.
+  (function () {
+    var saved = localStorage.getItem("theme"); // "dark" | "light" | null (system)
+    if (saved === "dark" || saved === "light") {
+      document.documentElement.setAttribute("data-theme", saved);
+    }
+  })();
+</script>
 </head>
 <body>
 
 <header class="topbar">
   <div>
     <h1>ATS Resume Intelligence</h1>
-    <div class="subtitle">Deterministic parsing &amp; ATS structural analysis &mdash; foundational MVP (Phases 1&ndash;5)</div>
+    <div class="subtitle">Deterministic parsing, ATS structural rules &amp; keyword coverage &mdash; LLM-powered career positioning when configured</div>
   </div>
-  <button class="secondary" id="export-btn" style="width:auto; display:none;">Export JSON Report</button>
+  <div class="topbar-actions">
+    <button class="secondary" id="export-btn" style="width:auto; display:none;">Export JSON Report</button>
+    <button id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+  </div>
 </header>
 
 <main class="layout">

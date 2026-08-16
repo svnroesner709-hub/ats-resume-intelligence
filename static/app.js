@@ -8,6 +8,30 @@ const state = {
 
 const $ = (sel) => document.querySelector(sel);
 
+// ---------- Theme toggle ----------
+
+function currentTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark" || saved === "light") return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyThemeIcon() {
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+  btn.textContent = currentTheme() === "dark" ? "☀️" : "🌙";
+}
+
+function toggleTheme() {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", next);
+  document.documentElement.setAttribute("data-theme", next);
+  applyThemeIcon();
+}
+
+document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+applyThemeIcon();
+
 // ---------- Upload / dropzone ----------
 
 const dropzone = $("#dropzone");
